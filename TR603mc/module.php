@@ -452,8 +452,8 @@ class STECA extends IPSModule
             if ($s == '') continue;
             $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
             if ($f ==1) {$steca_data['T1'] = $s;}
-            elseif ($f == 2) {$steca_data['T2'] = $s;
-								SetValue(IPS_GetVariableID("T1"),$s);}
+            elseif ($f == 2) {$steca_data['T2'] = $s;}
+		    SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
             elseif ($f == 3) {$steca_data['T3'] = $s;}
             elseif ($f == 4) {$steca_data['T4'] = $s;}
             elseif ($f == 5) {$steca_data['T5'] = $s;}
