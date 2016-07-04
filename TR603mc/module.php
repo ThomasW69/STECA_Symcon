@@ -391,7 +391,7 @@ class STECA extends IPSModule
             }
 			
             $data = substr($inbuf, 0, $pos);
-            $this->debug(__CLASS__, 'Data:' . $data);
+ //           $this->debug(__CLASS__, 'Data:' . $data);
             
 			$inbuf = substr($inbuf, $pos);
             //Daten decodieren 
@@ -445,15 +445,23 @@ class STECA extends IPSModule
 		
         $fields = explode(';', $data);
         $f = 0;  //Positionszähler
-        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
+//        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
         while ($f < count($fields) - 1) {
             $f++;
             $s = $fields[$f];  //String puffer für feld $f
             if ($s == '') continue;
             $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
-            if ($f ==2) {$steca_data['T1'] = $s;}
-            elseif ($f == 3) {$steca_data['T2'] = $s;}
-            elseif ($f == 10) {$steca_data['israining'] = ($s == 'ERR') ? 'YES' : 'NO';}
+            if ($f ==1) {$steca_data['T1'] = $s;}
+            elseif ($f == 2) {$steca_data['T2'] = $s;
+								IPS_GetVariableID("T1").SetValue($s);}
+            elseif ($f == 3) {$steca_data['T3'] = $s;}
+            elseif ($f == 4) {$steca_data['T4'] = $s;}
+            elseif ($f == 5) {$steca_data['T5'] = $s;}
+            elseif ($f == 6) {$steca_data['T6'] = $s;}
+            elseif ($f == 7) {$steca_data['R1'] = $s;}
+            elseif ($f == 7) {$steca_data['R2'] = $s;}
+            elseif ($f == 7) {$steca_data['R3'] = $s;}
+            elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'YES' : 'NO';}
         }//while
         $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
         return $steca_data;
