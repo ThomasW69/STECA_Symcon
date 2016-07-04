@@ -3,7 +3,11 @@
 	"name": "STECA",
 	"type": 3,
 	"vendor": "STECA",
-	"aliases": ["STECA TR603mc"],
+	"aliases": 
+	[ 
+	  "STECA TR603mc",
+	  "STECA TR603"
+	],
 	"parentRequirements": [],
 	"childRequirements": [],
 	"implemented": [],
