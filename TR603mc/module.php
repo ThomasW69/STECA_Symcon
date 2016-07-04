@@ -387,9 +387,14 @@ class STECA extends IPSModule
             if (!$pos) {
                 return $inbuf;
             }
+			
             $data = substr($inbuf, 0, $pos);
-            $inbuf = substr($inbuf, $pos);
-            if (preg_match('/\$([0-9,-;]+0)$/', $data, $records)) {
+            $this->debug(__CLASS__, 'Data' . $data);
+            
+			$inbuf = substr($inbuf, $pos);
+            $this->debug(__CLASS__, 'inbuf: ' . $inbuf);
+
+			if (preg_match('/\$([0-9,-;]+0)$/', $data, $records)) {
                 $r = count($records);
                 $this->debug(__FUNCTION__, "Found $r records");
                 for ($i = 1; $i < $r; $i++) { //matches starting with 1
