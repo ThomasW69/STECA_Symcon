@@ -342,9 +342,7 @@ class STECA extends IPSModule
             if (is_object($data)) $data = get_object_vars($data);
            if (isset($data['DataID'])) {
                 $target = $data['DataID'];
- 				$this->debug(__CLASS__, "dataID: ". $data['DataID']);
                 if ($target == $this->module_interfaces['IO-RX']) {
- 				$this->debug(__CLASS__, "dataID OK");
      				$this->debug(__CLASS__, "decode buffer");
   //                  $buffer .= utf8_decode($data['Buffer']);
                       $buffer .= $data['Buffer'];
@@ -384,7 +382,7 @@ class STECA extends IPSModule
         $this->debug(__CLASS__, 'ReadRecord:' . $inbuf);
         while (strlen($inbuf) > 0) {
             $pos = strpos($inbuf, chr(10));
-            $this->debug(__CLASS__, 'Pos:' . $pos);
+            $this->debug(__FUNCTION__, 'Pos:' . $pos);
 			
             if (!$pos) {
                 return $inbuf;
@@ -451,19 +449,27 @@ class STECA extends IPSModule
             $s = $fields[$f];  //String puffer für feld $f
             if ($s == '') continue;
             $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
-            if ($f ==1) {$steca_data['T1'] = $s;}
-            elseif ($f == 2) {$steca_data['T2'] = $s;
+            if ($f ==1) {$steca_data['T1'] = $s;
 		    SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
-            elseif ($f == 3) {$steca_data['T3'] = $s;}
-            elseif ($f == 4) {$steca_data['T4'] = $s;}
-            elseif ($f == 5) {$steca_data['T5'] = $s;}
-            elseif ($f == 6) {$steca_data['T6'] = $s;}
-            elseif ($f == 7) {$steca_data['R1'] = $s;}
-            elseif ($f == 7) {$steca_data['R2'] = $s;}
-            elseif ($f == 7) {$steca_data['R3'] = $s;}
+            elseif ($f == 2) {$steca_data['T2'] = $s;
+					    SetValue($this->GetIDForIdent("T2"), $steca_data['T2']);}
+            elseif ($f == 3) {$steca_data['T3'] = $s;
+					    SetValue($this->GetIDForIdent("T3"), $steca_data['T3']);}
+            elseif ($f == 4) {$steca_data['T4'] = $s;
+					    SetValue($this->GetIDForIdent("T4"), $steca_data['T4']);}
+            elseif ($f == 5) {$steca_data['T5'] = $s;
+					    SetValue($this->GetIDForIdent("T5"), $steca_data['T5']);}
+            elseif ($f == 6) {$steca_data['T6'] = $s;
+						SetValue($this->GetIDForIdent("T6"), $steca_data['T6']);}
+            elseif ($f == 7) {$steca_data['R1'] = $s;
+						SetValue($this->GetIDForIdent("R1"), $steca_data['T7']);}
+            elseif ($f == 7) {$steca_data['R2'] = $s;
+						SetValue($this->GetIDForIdent("R2"), $steca_data['R2']);}
+            elseif ($f == 7) {$steca_data['R3'] = $s;
+						SetValue($this->GetIDForIdent("R3"), $steca_data['R3']);}
             elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'YES' : 'NO';}
         }//while
-        $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
+ //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
         return $steca_data;
     }//function
 
