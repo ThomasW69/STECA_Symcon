@@ -383,7 +383,7 @@ class STECA extends IPSModule
     {
         $this->debug(__CLASS__, 'ReadRecord:' . $inbuf);
         while (strlen($inbuf) > 0) {
-            $pos = strpos($inbuf, chr(13));
+            $pos = strpos($inbuf, chr(10));
             if (!$pos) {
                 return $inbuf;
             }
