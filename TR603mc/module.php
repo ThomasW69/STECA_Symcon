@@ -103,6 +103,24 @@ class STECA extends IPSModule
         parent::Destroy();
     }
 	
+    //------------------------------------------------------------------------------
+    /**
+     * Check if a parent for Instance $id exists
+     * @param $id integer InstanceID
+     * @return integer
+     */
+    protected function GetParent($id = 0)
+    {
+        $parent = 0;
+        if ($id == 0) $id = $this->InstanceID;
+        if (IPS_InstanceExists($id)) {
+            $instance = IPS_GetInstance($id);
+            $parent = $instance['ConnectionID'];
+        } else {
+            $this->debug(__FUNCTION__, "Instance #$id doesn't exists");
+        }
+        return $parent;
+    }
 	
 	
     private function GetLogFile()
