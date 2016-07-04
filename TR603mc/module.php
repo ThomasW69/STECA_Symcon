@@ -61,11 +61,14 @@ class STECA extends IPSModule
         "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
     );
+    protected $DEBUGLOG = '';
+
 
     public function __construct($InstanceID)
     {
         // Diese Zeile nicht löschen
         parent::__construct($InstanceID);
+        $this->DEBUGLOG = IPS_GetLogDir() . "/" . "STECA" . "debug.log";
 
     }
 
@@ -454,9 +457,47 @@ class STECA extends IPSModule
         return $steca_data;
     }//function
 
+    /**
+     * Log an debug message
+     * PHP modules cannot enter data to debug window,use messages instead
+     * @param $topic
+     * @param $data
+     */
+    protected function debug($topic, $data)
+    {
+        if (method_exists($this,"SendDebug")) {
+            //available as of #150 (2016-04-22)
+            $this->SendDebug($topic,$data,0);
+        }
+    }
+    //------------------------------------------------------------------------------
+    /**
+     * check if debug is enabled
+     * @return bool
+     */
+    protected function isDebug()
+    {
+        $debug = @IPS_GetProperty($this->InstanceID, 'Debug');
+        return ($debug === true);
+    }
+    //--------------------------------------------------------
+    /**
+     * Log Debug to its own file
+     * @param $data
+     */
+    protected function debuglog($data)
+    {
+        if (!$this->isDebug()) return;
+        $fname = $this->DEBUGLOG;
+        $o = @fopen($fname, "a");
+        if (!$o) {
+            $this->debug(__FUNCTION__, 'Cannot open ' . $fname);
+            return;
+        }
+        fwrite($o, $data . "\n");
+        fclose($o);
+    }
 	
 	
-	
-    //function
 }//class
 ?>
