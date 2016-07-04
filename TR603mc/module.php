@@ -342,15 +342,15 @@ class STECA extends IPSModule
             if (is_object($data)) $data = get_object_vars($data);
            if (isset($data['DataID'])) {
                 $target = $data['DataID'];
- 				IPS_LogMessage(__CLASS__, "dataID: ". $data['DataID']);
+ 				$this->debug(__CLASS__, "dataID: ". $data['DataID']);
                 if ($target == $this->module_interfaces['IO-RX']) {
- 				IPS_LogMessage(__CLASS__, "dataID OK");
+ 				$this->debug(__CLASS__, "dataID OK");
                     $buffer .= utf8_decode($data['Buffer']);
                     $this->debug(__FUNCTION__, strToHex($buffer));
                     $bl = strlen($buffer);
                     if ($bl > 500) {
                         $buffer = substr($buffer, 500);
-                        IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
+                        $this->debug(__CLASS__, "Buffer length exceeded, dropping...");
                     }
                     $inbuf = $this->ReadRecord($buffer); //returns remaining chars
                     $this->SetBuffer($inbuf);
