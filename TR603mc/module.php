@@ -345,8 +345,10 @@ class STECA extends IPSModule
  				$this->debug(__CLASS__, "dataID: ". $data['DataID']);
                 if ($target == $this->module_interfaces['IO-RX']) {
  				$this->debug(__CLASS__, "dataID OK");
+     				$this->debug(__CLASS__, "decode buffer");
                     $buffer .= utf8_decode($data['Buffer']);
-                    $this->debug(__FUNCTION__, strToHex($buffer));
+                    $this->debug(__CLASS__, strToHex($buffer));
+					
                     $bl = strlen($buffer);
                     if ($bl > 500) {
                         $buffer = substr($buffer, 500);
