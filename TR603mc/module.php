@@ -350,10 +350,6 @@ class STECA extends IPSModule
              }
             //        $inbuf = $this->ReadRecord($buffer); //returns remaining chars
              $this->parse_solar($buffer); //Solardaten auslesen
-            }//dataid
-            else {
-                $this->debug(__FUNCTION__, 'No DataID supplied');
-            }//dataid
         } else {
             $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
         }//else len json
