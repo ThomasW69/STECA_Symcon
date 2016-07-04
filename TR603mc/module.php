@@ -323,16 +323,6 @@ class STECA extends IPSModule
     public function ReceiveData($JSONString)
     {
         //status check triggered by data
-		if ($this->isActive()) {
-           $this->debug(__FUNCTION__, 'active');
-		}
-	    else {
-           $this->debug(__FUNCTION__, 'not active');
-		}	
- 			
-		if ($this->HasActiveParent()) { 
-           $this->debug(__FUNCTION__, 'parent active');
-		}
 		
         if ($this->isActive() && $this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
@@ -350,20 +340,16 @@ class STECA extends IPSModule
             //entry for data from parent
 
             $buffer = $this->GetBuffer();
-            if (is_object($data)) $data = get_object_vars($data);
-            if (isset($data['DataID'])) {
-                $target = $data['DataID'];
-                if ($target == $this->module_interfaces['IO-RX']) {
-                    $buffer .= utf8_decode($data['Buffer']);
-                    $this->debug(__FUNCTION__, strToHex($buffer));
-                    $bl = strlen($buffer);
-                    if ($bl > 500) {
-                        $buffer = substr($buffer, 500);
-                        IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
-                    }
-                    $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-                    $this->SetBuffer($inbuf);
-                }//target
+            $buffer .= utf8_decode($data['Buffer']);
+            $this->debug(__FUNCTION__, strToHex($buffer));
+            $bl = strlen($buffer);
+			
+             if ($bl > 500) {
+                $buffer = substr($buffer, 500);
+                IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
+             }
+            //        $inbuf = $this->ReadRecord($buffer); //returns remaining chars
+             $this->parse_solar($buffer); //Solardaten auslesen
             }//dataid
             else {
                 $this->debug(__FUNCTION__, 'No DataID supplied');
