@@ -304,6 +304,17 @@ class STECA extends IPSModule
     public function ReceiveData($JSONString)
     {
         //status check triggered by data
+		if ($this->isActive() {
+           $this->debug(__FUNCTION__, 'active');
+		}
+	    else {
+           $this->debug(__FUNCTION__, 'not active');
+		}	
+ 			
+		if ($this->HasActiveParent() { 
+           $this->debug(__FUNCTION__, 'parent active');
+		}
+		
         if ($this->isActive() && $this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
         } else {
