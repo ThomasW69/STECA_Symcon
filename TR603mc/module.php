@@ -64,7 +64,8 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('R3', 'R3', "");
 
         //Timers
-        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
+//        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
+        $this->RegisterTimer('ReInit', 60000, "");
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['SerialPort']);
