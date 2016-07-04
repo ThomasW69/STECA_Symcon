@@ -163,6 +163,18 @@ class STECA extends IPSModule
         return $parent;
     }
 	
+    //--------------------------------------------------------
+    /**
+     * Check if the given Instance is active
+     * @param int $id
+     * @return bool
+     */
+    protected function isActive($id = 0)
+    {
+        if ($id == 0) $id = $this->InstanceID;
+        $res = (bool)IPS_GetProperty($id, 'Active');
+        return $res;
+    }
 	
     private function GetLogFile()
     {
