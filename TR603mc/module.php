@@ -389,30 +389,11 @@ class STECA extends IPSModule
             }
 			
             $data = substr($inbuf, 0, $pos);
-            $this->debug(__CLASS__, 'Data' . $data);
+            $this->debug(__CLASS__, 'Data:' . $data);
             
 			$inbuf = substr($inbuf, $pos);
-            $this->debug(__CLASS__, 'inbuf: ' . $inbuf);
-
-			if (preg_match('/\$([0-9,-;]+0)$/', $data, $records)) {
-                $r = count($records);
-                $this->debug(__FUNCTION__, "Found $r records");
-                for ($i = 1; $i < $r; $i++) { //matches starting with 1
-                    $data = $records[$i];
-                    $data = str_replace(',', '.', $data);
-                    $steca_data = $this->parse_solar($data);
-                    //if result
-                    if ($steca_data) {
-                       //@$this->SendWSData($steca_data);
-                       //@ $this->log_weather($steca_data);
-
-                    } else {
-                        $this->debug(__FUNCTION__, "No stecadata returned for $data");
-                    }//if wsdata
-                }//for
-            } else {
-                $this->debug(__FUNCTION__, "No match in inbuf");
-            }//if pregmatch
+            //Daten decodieren 
+            $steca_data = $this->parse_solar($data);
         }//while
         return $inbuf;
     }//function
@@ -435,12 +416,11 @@ class STECA extends IPSModule
 		$steca_data = array();
         $records = array();
         
-		for ($p = 0; $p < self::MAXSENSORS; $p++) {
-            $records[$p] = array('typ' => '', 'id' => '', 'sensor' => '', 'temp' => '', 'hum' => '', 'lost' => '');
-        }
+//		for ($p = 0; $p < self::MAXSENSORS; $p++) {
+//            $records[$p] = array('typ' => '', 'id' => '', 'sensor' => '', 'temp' => '', 'hum' => '', 'lost' => '');
+//        }
 
         //Felddefinitiionen
-		$steca_data['records'] = $records;
         $steca_data['Time'] = '';  
         $steca_data['T1'] = '';
         $steca_data['T2'] = '';
@@ -467,44 +447,14 @@ class STECA extends IPSModule
         while ($f < count($fields) - 1) {
             $f++;
             $s = $fields[$f];  //String puffer für feld $f
-            if ($s == '') continue;//??
-            $this->debug(__FUNCTION__, 'Field:' . $f . '=' . $s);
-            if ($f >= 3 && $f <= 10) {
-                $steca_data['records'][$f - 3]['temp'] = $s;
-                $steca_data['records'][$f - 3]['id'] = $f - 3;
-                $steca_data['records'][$f - 3]['typ'] = 'T';
-
-            } elseif ($f >= 11 && $f <= 18) {
-                $steca_data['records'][$f - 11]['hum'] = $s;
-                $steca_data['records'][$f - 11]['typ'] = 'T/F';
-            } elseif ($f == 19) {
-                $steca_data['records'][8]['temp'] = $s;
-                $steca_data['records'][8]['id'] = 8;
-                $steca_data['records'][8]['typ'] = 'Kombisensor';
-            } elseif ($f == 20) {
-                $steca_data['records'][8]['hum'] = $s;
-            } elseif ($f == 21) {
-                $steca_data['wind'] = $s;
-            } elseif ($f == 22) {
-                $steca_data['rainc'] = $s;
-                if (strlen($s) > 0) {
-                    $rainc = (int)$s;
-                    $rc = $this->GetRainPerCount();
-                    $val = $rc / 1000 * $rainc;
-                    $m = round($val, 1);
-                    $steca_data['rain'] = $m;
-                }
-            } elseif ($f == 23) {
-                $steca_data['israining'] = ($s == '1') ? 'YES' : 'NO';
-            }//if
+            if ($s == '') continue;
+            $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
+            if ($f ==2) {$steca_data['T1'] = $s;}
+            elseif ($f == 3) {$steca_data['T2'] = $s;}
+            elseif ($f == 10) {$steca_data['israining'] = ($s == 'ERR') ? 'YES' : 'NO';}
         }//while
-
-        if ($f >= 23) {
-            $this->debug(__FUNCTION__, 'OK');
-        } else {
-            $this->debug(__FUNCTION__, "Field Error (24 expected, $f received)");
         }
-        $this->debug(__FUNCTION__, " Parsed Data:" . print_r($steca_data, true));
+        $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
         return $steca_data;
     }//function
 
