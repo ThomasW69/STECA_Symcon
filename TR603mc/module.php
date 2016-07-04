@@ -145,6 +145,15 @@ class STECA extends IPSModule
         public function ApplyChanges() {
             // Diese Zeile nicht löschen
             parent::ApplyChanges();
+			
+          if ($this->isActive() && $this->HasActiveParent()) {
+            $this->SetStatus(self::ST_AKTIV);
+            $this->init();
+        } else {
+            $this->SetStatus(self::ST_INACTIV);
+            $this->SetTimerInterval('ReInit', 0);
+        }
+
         }
 		
     //--------------------------------------------------------
