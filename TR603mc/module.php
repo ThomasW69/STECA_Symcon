@@ -546,6 +546,12 @@ class STECA extends IPSModule
         fclose($o);
     }
 	
+    protected function GetInstanceStatus($id = 0)
+    {
+        if ($id == 0) $id = $this->InstanceID;
+        $inst = IPS_GetInstance($id);
+        return $inst['InstanceStatus'];
+    }
 	
 }//class
 ?>
