@@ -7,6 +7,11 @@
 //Klassendefinition
 class STECA extends IPSModule
 {
+    /**
+     * Timer constant
+     * maxage of LastUpdate in sec before ReInit
+     */
+    const MAXAGE = 300;
 
     public function __construct($InstanceID)
     {
@@ -50,6 +55,8 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('R2', 'R2', "");
         $this->RegisterVariableInteger('R3', 'R3', "");
 
+        //Timers
+        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['SerialPort']);
@@ -86,6 +93,290 @@ class STECA extends IPSModule
     {
         parent::Destroy();
     }
+	
+	
+	
+    private function GetLogFile()
+    {
+        return (String)IPS_GetProperty($this->InstanceID, 'LogFile');
+    }
+
+
+    private function GetParentCategory()
+    {
+        return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
+    }
+
+    private function GetBuffer()
+    {
+        $id = $this->GetIDForIdent('Buffer');
+        $val = GetValueString($id);
+        return $val;
+    }
+
+    private function SetBuffer($val)
+    {
+        $id = $this->GetIDForIdent('Buffer');
+        SetValueString($id, $val);
+    }
+
+    //------------------------------------------------------------------------------
+    //---Events
+    //------------------------------------------------------------------------------
+    /**
+     * Timer Event to reinitialize system
+     * Executed if there are no valid data within Timer as indicated by LastUpdate
+     */
+    public function ReInitEvent()
+    {
+        $id = @$this->GetIDForIdent('LastUpdate');
+        if (!$id) return;
+        $var = IPS_GetVariable($id);
+        if (!$var) return;
+        $last = $var['VariableUpdated'];
+        //if (!$last) $last=0;
+        $now = time();
+        $diff = $now - $last;
+        $this->debug(__FUNCTION__, "last update $diff s ago");
+        if (($diff > self::MAXAGE) && $this->isActive() && $this->HasActiveParent()) {
+            $this->init();
+        }
+    }
+
+    //------------------------------------------------------------------------------
+    //device functions
+    //------------------------------------------------------------------------------
+    /**
+     * Set IO properties
+     */
+    private function SyncParent()
+    {
+        $ParentID = $this->GetParent();
+        if ($ParentID > 0) {
+            $this->debug(__FUNCTION__, 'entered');
+            $ParentInstance = IPS_GetInstance($ParentID);
+            if ($ParentInstance['ModuleInfo']['ModuleID'] == $this->module_interfaces['SerialPort']) {
+                if (IPS_GetProperty($ParentID, 'DataBits') <> 8)
+                    IPS_SetProperty($ParentID, 'DataBits', 8);
+                if (IPS_GetProperty($ParentID, 'StopBits') <> 1)
+                    IPS_SetProperty($ParentID, 'StopBits', 1);
+                if (IPS_GetProperty($ParentID, 'BaudRate') <> 9600)
+                    IPS_SetProperty($ParentID, 'BaudRate', 9600);
+                if (IPS_GetProperty($ParentID, 'Parity') <> 'None')
+                    IPS_SetProperty($ParentID, 'Parity', "None");
+
+                if (IPS_HasChanges($ParentID)) {
+                    IPS_SetProperty($ParentID, 'Open', false);
+                    @IPS_ApplyChanges($ParentID);
+                    IPS_Sleep(200);
+                    $port = IPS_GetProperty($ParentID, 'Port');
+                    if ($port) {
+                        IPS_SetProperty($ParentID, 'Open', true);
+                        @IPS_ApplyChanges($ParentID);
+                    }
+                }
+            }//serialPort
+        }//parentID
+    }//function
+	
+	
+    //------------------------------------------------------------------------------
+    /**
+     * Initialization sequence
+     */
+    private function init()
+    {
+        $this->debug(__FUNCTION__, 'Init entered');
+        $this->SyncParent();
+        $this->SetBuffer('');
+        $this->SetTimerInterval('ReInit', 60000);
+    }
+	
+
+
+//------------------------------------------------------------------------------
+    /**
+     * Data Interface from Parent(IO-RX)
+     * @param string $JSONString
+     *Daten aus dem Serial port lesen
+	 */
+    public function ReceiveData($JSONString)
+    {
+        //status check triggered by data
+        if ($this->isActive() && $this->HasActiveParent()) {
+            $this->SetStatus(self::ST_AKTIV);
+        } else {
+            $this->SetStatus(self::ST_INACTIV);
+            $this->debug(__FUNCTION__, 'Data arrived, but dropped because inactiv:' . $JSONString);
+            return;
+        }
+        // decode Data from Device Instanz
+        if (strlen($JSONString) > 0) {
+            $this->debug(__FUNCTION__, 'Data arrived:' . $JSONString);
+            $this->debuglog($JSONString);
+            // decode Data from IO Instanz
+            $data = json_decode($JSONString);
+            //entry for data from parent
+
+            $buffer = $this->GetBuffer();
+            if (is_object($data)) $data = get_object_vars($data);
+            if (isset($data['DataID'])) {
+                $target = $data['DataID'];
+                if ($target == $this->module_interfaces['IO-RX']) {
+                    $buffer .= utf8_decode($data['Buffer']);
+                    $this->debug(__FUNCTION__, strToHex($buffer));
+                    $bl = strlen($buffer);
+                    if ($bl > 500) {
+                        $buffer = substr($buffer, 500);
+                        IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
+                    }
+                    $inbuf = $this->ReadRecord($buffer); //returns remaining chars
+                    $this->SetBuffer($inbuf);
+                }//target
+            }//dataid
+            else {
+                $this->debug(__FUNCTION__, 'No DataID supplied');
+            }//dataid
+        } else {
+            $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
+        }//else len json
+    }//func
+	
+	
+	
+	
+	    //------------------------------------------------------------------------------
+    /**
+     * Takes an input string and prepare it for parsing
+     * @param $inbuf
+     * @return string
+     */
+    public function ReadRecord($inbuf)
+    {
+        $this->debug(__FUNCTION__, 'ReadRecord:' . $inbuf);
+        while (strlen($inbuf) > 0) {
+            $pos = strpos($inbuf, chr(13));
+            if (!$pos) {
+                return $inbuf;
+            }
+            $data = substr($inbuf, 0, $pos);
+            $inbuf = substr($inbuf, $pos);
+            if (preg_match('/\$([0-9,-;]+0)$/', $data, $records)) {
+                $r = count($records);
+                $this->debug(__FUNCTION__, "Found $r records");
+                for ($i = 1; $i < $r; $i++) { //matches starting with 1
+                    $data = $records[$i];
+                    $data = str_replace(',', '.', $data);
+                    $steca_data = $this->parse_solar($data);
+                    //if result
+                    if ($steca_data) {
+                       //@$this->SendWSData($steca_data);
+                       //@ $this->log_weather($steca_data);
+
+                    } else {
+                        $this->debug(__FUNCTION__, "No stecadata returned for $data");
+                    }//if wsdata
+                }//for
+            } else {
+                $this->debug(__FUNCTION__, "No match in inbuf");
+            }//if pregmatch
+        }//while
+        return $inbuf;
+    }//function
+
+    //------------------------------------------------------------------------------
+    /**
+     * parses an record string
+     * @param String $data
+     * @return array
+	 * noch anpassen für die STECA Strings
+     */
+    private function parse_solar($data)
+    {
+        //clear record
+        //$1;1;;21,2;22,4;25,1;14,6;15,8;12,1;;24,5;37;;78;72;;75;;:50;16,0;42;8,0;455;1;0<cr><lf>
+        $this->debug(__FUNCTION__, 'Entered:' . $data);
+        
+		//Array definieren
+		$steca_data = array();
+        $records = array();
+        
+		for ($p = 0; $p < self::MAXSENSORS; $p++) {
+            $records[$p] = array('typ' => '', 'id' => '', 'sensor' => '', 'temp' => '', 'hum' => '', 'lost' => '');
+        }
+
+        //Felddefinitiionen
+		$steca_data['records'] = $records;
+        $steca_data['Time'] = '';  
+        $steca_data['T1'] = '';
+        $steca_data['T2'] = '';
+	    $steca_data['T3'] = '';
+	    $steca_data['T4'] = '';
+	    $steca_data['T5'] = '';
+	    $steca_data['T6'] = '';
+	    $steca_data['R1'] = '';
+	    $steca_data['R2'] = '';
+	    $steca_data['R3'] = '';
+        $steca_data['System'] = '';
+	    $steca_data['WMZ'] = '';
+	    $steca_data['p-curr'] = '';
+	    $steca_data['p_comp'] = '';
+	    $steca_data['radiation'] = '';
+	    $steca_data['TDS'] = '';
+	    $steca_data['v_flow'] = '';
+	    $steca_data['Alarm'] = '';
+		
+		
+        $fields = explode(';', $data);
+        $f = 0;  //Positionszähler
+        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
+        while ($f < count($fields) - 1) {
+            $f++;
+            $s = $fields[$f];  //String puffer für feld $f
+            if ($s == '') continue;//??
+            $this->debug(__FUNCTION__, 'Field:' . $f . '=' . $s);
+            if ($f >= 3 && $f <= 10) {
+                $steca_data['records'][$f - 3]['temp'] = $s;
+                $steca_data['records'][$f - 3]['id'] = $f - 3;
+                $steca_data['records'][$f - 3]['typ'] = 'T';
+
+            } elseif ($f >= 11 && $f <= 18) {
+                $steca_data['records'][$f - 11]['hum'] = $s;
+                $steca_data['records'][$f - 11]['typ'] = 'T/F';
+            } elseif ($f == 19) {
+                $steca_data['records'][8]['temp'] = $s;
+                $steca_data['records'][8]['id'] = 8;
+                $steca_data['records'][8]['typ'] = 'Kombisensor';
+            } elseif ($f == 20) {
+                $steca_data['records'][8]['hum'] = $s;
+            } elseif ($f == 21) {
+                $steca_data['wind'] = $s;
+            } elseif ($f == 22) {
+                $steca_data['rainc'] = $s;
+                if (strlen($s) > 0) {
+                    $rainc = (int)$s;
+                    $rc = $this->GetRainPerCount();
+                    $val = $rc / 1000 * $rainc;
+                    $m = round($val, 1);
+                    $steca_data['rain'] = $m;
+                }
+            } elseif ($f == 23) {
+                $steca_data['israining'] = ($s == '1') ? 'YES' : 'NO';
+            }//if
+        }//while
+
+        if ($f >= 23) {
+            $this->debug(__FUNCTION__, 'OK');
+        } else {
+            $this->debug(__FUNCTION__, "Field Error (24 expected, $f received)");
+        }
+        $this->debug(__FUNCTION__, " Parsed Data:" . print_r($steca_data, true));
+        return $steca_data;
+    }//function
+
+	
+	
+	
     //function
 }//class
 ?>
