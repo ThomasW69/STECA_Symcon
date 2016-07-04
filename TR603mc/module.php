@@ -11,7 +11,48 @@ class STECA extends IPSModule
      * Timer constant
      * maxage of LastUpdate in sec before ReInit
      */
+	 
     const MAXAGE = 300;
+    //------------------------------------------------------------------------------
+    //module const and vars
+    //------------------------------------------------------------------------------
+    /**
+     * Kernel Status "Ready"
+     */
+    const KR_READY = 10103;
+    /**
+     * Module Status aktive
+     */
+    const ST_AKTIV = 102;
+    /**
+     * Module Status "inactive"
+     */
+    const ST_INACTIV = 104;
+    /**
+     * Module Status "Error"
+     */
+    const ST_ERROR = 201;
+    /**
+     * Custom Module Status "NoParent"
+     */
+    const ST_NOPARENT = 202;
+    /**
+     * IPS Variable Type Boolean
+     */
+    const VT_Boolean = 0;
+    /**
+     * IPS Variable Type Integer
+     */
+    const VT_Integer = 1;
+    /**
+     * IPS Variable Type Float
+     */
+    const VT_Float = 2;
+    /**
+     * IPS Variable Type String
+     */
+    const VT_String = 3;
+
     protected $module_data = array();
     protected $module_interfaces = array(
         //IO
