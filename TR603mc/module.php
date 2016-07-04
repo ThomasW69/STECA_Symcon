@@ -183,6 +183,25 @@ class STECA extends IPSModule
         }
         return $parent;
     }
+
+
+    protected function HasActiveParent($id = 0)
+    {
+        if ($id == 0) $id = $this->InstanceID;
+        $parent = $this->GetParent($id);
+        if ($parent > 0) {
+            $status = $this->GetInstanceStatus($parent);
+            if ($status == self::ST_AKTIV) {
+                return true;
+            } else {
+                //IPS_SetInstanceStatus($id, self::ST_NOPARENT);
+                $this->debug(__FUNCTION__, "Parent not active for Instance #" . $id);
+                return false;
+            }
+        }
+        $this->debug(__FUNCTION__, "No Parent for Instance #" . $id);
+        return false;
+    }
 	
     //--------------------------------------------------------
     /**
