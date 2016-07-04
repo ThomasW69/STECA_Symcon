@@ -323,7 +323,6 @@ class STECA extends IPSModule
     public function ReceiveData($JSONString)
     {
         //status check triggered by data
-		
         if ($this->isActive() && $this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
         } else {
@@ -340,20 +339,29 @@ class STECA extends IPSModule
             //entry for data from parent
 
             $buffer = $this->GetBuffer();
-            $buffer .= utf8_decode($data['Buffer']);
-            $this->debug(__FUNCTION__, strToHex($buffer));
-            $bl = strlen($buffer);
-			
-             if ($bl > 500) {
-                $buffer = substr($buffer, 500);
-                IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
-             }
-            //        $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-             $this->parse_solar($buffer); //Solardaten auslesen
+            if (is_object($data)) $data = get_object_vars($data);
+            if (isset($data['DataID'])) {
+                $target = $data['DataID'];
+                if ($target == $this->module_interfaces['IO-RX']) {
+                    $buffer .= utf8_decode($data['Buffer']);
+                    $this->debug(__FUNCTION__, strToHex($buffer));
+                    $bl = strlen($buffer);
+                    if ($bl > 500) {
+                        $buffer = substr($buffer, 500);
+                        IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
+                    }
+                    $inbuf = $this->ReadRecord($buffer); //returns remaining chars
+                    $this->SetBuffer($inbuf);
+                }//target
+            }//dataid
+            else {
+                $this->debug(__FUNCTION__, 'No DataID supplied');
+            }//dataid
         } else {
             $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
         }//else len json
     }//func
+
 	
 	
 	
@@ -406,6 +414,7 @@ class STECA extends IPSModule
      */
     private function parse_solar($data)
     {
+    
         //clear record
         //$1;1;;21,2;22,4;25,1;14,6;15,8;12,1;;24,5;37;;78;72;;75;;:50;16,0;42;8,0;455;1;0<cr><lf>
         $this->debug(__FUNCTION__, 'Entered:' . $data);
