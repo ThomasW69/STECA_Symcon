@@ -67,9 +67,18 @@ class STECA extends IPSModule
     public function __construct($InstanceID)
     {
         // Diese Zeile nicht löschen
-        parent::__construct($InstanceID);
-        $this->DEBUGLOG = IPS_GetLogDir() . "/" . "STECA" . "debug.log";
+        $json_file = __DIR__ . "/module.json";
 
+        parent::__construct($InstanceID);
+        $json = @file_get_contents($json_file);
+        $data = @json_decode($json, true);
+        $this->module_data = $data;
+        $this->name = $data["name"];
+        if (!isset($this->name)) {
+            IPS_LogMessage(__CLASS__, "Reading Moduldata from module.json failed!");
+            return false;
+        }
+        $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
     }
 
     public function Create()
@@ -108,8 +117,8 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('R3', 'R3', "");
 
         //Timers
-//        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
-        $this->RegisterTimer('ReInit', 60000, "");
+        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
+//        $this->RegisterTimer('ReInit', 60000, "");
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['SerialPort']);
