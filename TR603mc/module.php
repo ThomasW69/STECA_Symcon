@@ -453,7 +453,6 @@ class STECA extends IPSModule
             elseif ($f == 3) {$steca_data['T2'] = $s;}
             elseif ($f == 10) {$steca_data['israining'] = ($s == 'ERR') ? 'YES' : 'NO';}
         }//while
-        }
         $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
         return $steca_data;
     }//function
