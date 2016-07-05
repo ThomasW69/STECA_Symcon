@@ -164,7 +164,8 @@ class STECA extends IPSModule
 			IPS_SetVariableProfileValues($name, $MinValue, $MaxValue, $StepSize);
 			IPS_SetVariableProfileDigits($name, $Digits);
 			IPS_SetVariableProfileIcon($name, $Icon);
-
+        }
+    }		
 	//Variablenprofil für die Windgeschwindigkeit erstellen
 	private function CreateVarProfileAlamSolar() {
 		if (!IPS_VariableProfileExists("AlarmSolar")) {
@@ -173,7 +174,8 @@ class STECA extends IPSModule
 			IPS_SetVariableProfileAssociation("AlarmSolar", 1, "Alarm", "Speaker", 0xFF0000);
 			IPS_SetVariableProfileAssociation("AlarmSolar", 0, "kein", "", 0x00FF00);
 		 }
-	}	
+	}
+	
 	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
         public function ApplyChanges() {
             // Diese Zeile nicht löschen
