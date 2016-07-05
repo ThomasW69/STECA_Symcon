@@ -508,7 +508,7 @@ class STECA extends IPSModule
 						SetValue($this->GetIDForIdent("radiation"), $steca_data['radiation']);}
             elseif ($f == 17) {$steca_data['Tds'] = $s;
 						SetValue($this->GetIDForIdent("Tds"), $steca_data['Tds']);}
-            elseif ($f == 18) {$steca_data['v_flow'] = $s;
+            elseif ($f == 20) {$steca_data['v_flow'] = $s;
 						SetValue($this->GetIDForIdent("v_flow"), $steca_data['v_flow']);}
 
 			elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
