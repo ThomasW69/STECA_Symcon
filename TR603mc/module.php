@@ -86,19 +86,25 @@ class STECA extends IPSModule
         // Diese Zeile nicht löschen.
         parent::Create();
 		
-        $this->RegisterPropertyString('Category', 'STECA Devices');
+        //Properties
+		$this->RegisterPropertyString('Category', 'STECA Devices');
         $this->RegisterPropertyInteger('ParentCategory', 0); //parent cat is root
         $this->RegisterPropertyString('LogFile', '');
         $this->RegisterPropertyBoolean('AutoCreate', true);
         $this->RegisterPropertyBoolean('Debug', false);
         $this->RegisterPropertyBoolean('Active', false);
 
-		//Profile
-	//	$this->RegisterVariableProfile('TempSolar', 'Temperatur','', ' °C', -200, 500, 1);
-    //    $this->RegisterVariableProfile('PowSolar','','',' kW',0,1000,0.1,1);
-    //    $this->RegisterVariableProfile('FlowSolar','','',' l/min',0,50,1);
-    //    $this->RegisterVariableProfile('AlarmSolar','','ALARM','',$FF0000,'Kein','',$00FF00);
-    //    $this->RegisterVariableProfile('WMZSolar','','An','',$00FF00,'Aus','',$FF0000);
+		//VariablenProfile
+	   // CreateVarProfile($name, $ProfileType, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Icon) {
+
+//		$this->CreateVarProfile("WGW.Rainfall", 2, " Liter/m²" ,0 , 10, 0 , 2, "Rainfall");
+		$this->CreateVarProfile('TempSolar',1,' °C', -200, 500, 1,0,"Temperature");
+        $this->CreateVarProfile('PowSolar',2,' kW',0,1000,0.1,1,'');
+        $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,'');
+		$this->CreateVarProfileAlarmSolar();
+		
+		//        $this->CreateVarProfile('AlarmSolar',0,'ALARM','',$FF0000,'Kein','',$00FF00);
+//        $this->CreateVarProfile('WMZSolar',2,'An','',$00FF00,'Aus','',$FF0000);
 
 		
         //Vars
@@ -106,15 +112,24 @@ class STECA extends IPSModule
         IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
         $this->RegisterVariableString('LastUpdate', 'Last Update', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
-        $this->RegisterVariableInteger('T1', 'T1', "");
-        $this->RegisterVariableInteger('T2', 'T2', "");
-        $this->RegisterVariableInteger('T3', 'T3', "");
-        $this->RegisterVariableInteger('T4', 'T4', "");
-        $this->RegisterVariableInteger('T5', 'T5', "");
-        $this->RegisterVariableInteger('T6', 'T6', "");
-        $this->RegisterVariableInteger('R1', 'R1', "");
-        $this->RegisterVariableInteger('R2', 'R2', "");
-        $this->RegisterVariableInteger('R3', 'R3', "");
+        $this->RegisterVariableInteger('T1', 'T1', "TempSolar");
+        $this->RegisterVariableInteger('T2', 'T2', "TempSolar");
+        $this->RegisterVariableInteger('T3', 'T3', "TempSolar");
+        $this->RegisterVariableInteger('T4', 'T4', "TempSolar");
+        $this->RegisterVariableInteger('T5', 'T5', "TempSolar");
+        $this->RegisterVariableInteger('T6', 'T6', "TempSolar");
+        $this->RegisterVariableInteger('R1', 'R1', "~Intensity.100");
+        $this->RegisterVariableInteger('R2', 'R2', "~Intensity.100");
+        $this->RegisterVariableInteger('R3', 'R3', "~Intensity.100");
+
+        $this->RegisterVariableInteger('System', 'System', "");
+        $this->RegisterVariableBoolean('WMZ', 'WMZ', "WMZSolar");
+        $this->RegisterVariableFloat('p_curr', 'p_curr', "PowSolar");
+        $this->RegisterVariableInteger('p_comp', 'p_comp', "");
+        $this->RegisterVariableInteger('radiation', 'radiation', "");
+        $this->RegisterVariableInteger('Tds', 'Tds', "TempSolar");
+        $this->RegisterVariableInteger('v_flow', 'v_flow', "FlowSolar");
+        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar");
 
         //Timers
         $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
@@ -140,7 +155,25 @@ class STECA extends IPSModule
         }
 		
 	}
-	
+
+		// Variablenprofile erstellen
+	private function CreateVarProfile($name, $ProfileType, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Icon) {
+		if (!IPS_VariableProfileExists($name)) {
+			IPS_CreateVariableProfile($name, $ProfileType);
+			IPS_SetVariableProfileText($name, "", $Suffix);
+			IPS_SetVariableProfileValues($name, $MinValue, $MaxValue, $StepSize);
+			IPS_SetVariableProfileDigits($name, $Digits);
+			IPS_SetVariableProfileIcon($name, $Icon);
+
+	//Variablenprofil für die Windgeschwindigkeit erstellen
+	private function CreateVarProfileAlamSolar() {
+		if (!IPS_VariableProfileExists("AlarmSolar")) {
+			IPS_CreateVariableProfile("AlarmSolar", 0);
+			IPS_SetVariableProfileIcon("AlamSolar", "Speaker");
+			IPS_SetVariableProfileAssociation("AlarmSolar", 1, "Alarm", "Speaker", 0xFF0000);
+			IPS_SetVariableProfileAssociation("AlarmSolar", 0, "kein", "", 0x00FF00);
+		 }
+	}	
 	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
         public function ApplyChanges() {
             // Diese Zeile nicht löschen
@@ -520,6 +553,8 @@ class STECA extends IPSModule
         $inst = IPS_GetInstance($id);
         return $inst['InstanceStatus'];
     }
+	
+
 	
 }//class
 ?>
