@@ -108,7 +108,7 @@ class STECA extends IPSModule
         //Vars
         $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
         IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
-        $this->RegisterVariableString('LastUpdate', 'Last Update', "", -4);
+        $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
         $this->RegisterVariableInteger('T1', 'T1', "TempSolar");
         $this->RegisterVariableInteger('T2', 'T2', "TempSolar");
@@ -282,7 +282,7 @@ class STECA extends IPSModule
      */
     public function ReInitEvent()
     {
-        $id = @$this->GetIDForIdent('Last Update');
+        $id = @$this->GetIDForIdent('LastUpdate');
         if (!$id) return;
         $var = IPS_GetVariable($id);
         if (!$var) return;
@@ -516,7 +516,8 @@ class STECA extends IPSModule
  //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
 
     $this->debug(__FUNCTION__, 'Finished');
-    $vid = @$this->GetIDForIdent('Last Update');
+    $vid = @$this->GetIDForIdent('LastUpdate');
+	$datum = date("d.m.Y H:i:s",time());
     SetValueString($vid, $datum);
 
     return $steca_data;
