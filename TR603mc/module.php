@@ -100,7 +100,7 @@ class STECA extends IPSModule
 //		$this->CreateVarProfile("WGW.Rainfall", 2, " Liter/m²" ,0 , 10, 0 , 2, "Rainfall");
 		$this->CreateVarProfile('TempSolar',1,' °C', -200, 500, 1,0,"Temperature");
         $this->CreateVarProfile('PowSolar',2,' kW',0,1000,0.1,1,'');
-        $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,'');
+        $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
 		
 		//        $this->CreateVarProfile('AlarmSolar',0,'ALARM','',$FF0000,'Kein','',$00FF00);
@@ -123,12 +123,12 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('R3', 'R3', "~Intensity.100");
 
         $this->RegisterVariableInteger('System', 'System', "");
-        $this->RegisterVariableBoolean('WMZ', 'WMZ', "WMZSolar");
-        $this->RegisterVariableFloat('p_curr', 'p_curr', "PowSolar");
-        $this->RegisterVariableInteger('p_comp', 'p_comp', "");
-        $this->RegisterVariableInteger('radiation', 'radiation', "");
-        $this->RegisterVariableInteger('Tds', 'Tds', "TempSolar");
-        $this->RegisterVariableInteger('v_flow', 'v_flow', "FlowSolar");
+        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "WMZSolar");
+        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar");
+        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "");
+        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "");
+        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar");
+        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar");
         $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar");
 
         //Timers
@@ -167,10 +167,10 @@ class STECA extends IPSModule
         }
     }		
 	//Variablenprofil für die Windgeschwindigkeit erstellen
-	private function CreateVarProfileAlamSolar() {
+	private function CreateVarProfileAlarmSolar() {
 		if (!IPS_VariableProfileExists("AlarmSolar")) {
 			IPS_CreateVariableProfile("AlarmSolar", 0);
-			IPS_SetVariableProfileIcon("AlamSolar", "Speaker");
+			IPS_SetVariableProfileIcon("AlarmSolar", "Speaker");
 			IPS_SetVariableProfileAssociation("AlarmSolar", 1, "Alarm", "Speaker", 0xFF0000);
 			IPS_SetVariableProfileAssociation("AlarmSolar", 0, "kein", "", 0x00FF00);
 		 }
