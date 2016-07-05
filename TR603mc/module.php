@@ -102,9 +102,6 @@ class STECA extends IPSModule
         $this->CreateVarProfile('PowSolar',2,' kW',0,1000,0.1,1,'');
         $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
-		
-		//        $this->CreateVarProfile('AlarmSolar',0,'ALARM','',$FF0000,'Kein','',$00FF00);
-//        $this->CreateVarProfile('WMZSolar',2,'An','',$00FF00,'Aus','',$FF0000);
 
 		
         //Vars
@@ -123,7 +120,7 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('R3', 'R3', "~Intensity.100");
 
         $this->RegisterVariableInteger('System', 'System', "");
-        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "WMZSolar");
+        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "");
         $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar");
         $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "");
         $this->RegisterVariableInteger('radiation', 'Einstrahlung', "");
