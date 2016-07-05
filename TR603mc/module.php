@@ -420,13 +420,14 @@ class STECA extends IPSModule
             if (!$pos) {
                 return $inbuf;
             }
-			
+			if ($pos >=80) {
             $data = substr($inbuf, 0, $pos);
  //           $this->debug(__CLASS__, 'Data:' . $data);
             
 			$inbuf = substr($inbuf, $pos);
             //Daten decodieren 
             $steca_data = $this->parse_solar($data);
+			}
         }//while
         return $inbuf;
     }//function
@@ -513,7 +514,12 @@ class STECA extends IPSModule
 			elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
         }//while
  //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
-        return $steca_data;
+
+    $this->debug(__FUNCTION__, 'Finished');
+    $vid = @$this->GetIDForIdent('LastUpdate');
+    SetValueString($vid, $datum);
+
+    return $steca_data;
     }//function
 
     /**
