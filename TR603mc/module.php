@@ -101,6 +101,7 @@ class STECA extends IPSModule
 		$this->CreateVarProfile('TempSolar',1,' °C', -200, 500, 1,0,"Temperature");
         $this->CreateVarProfile('PowSolar',2,' kW',0,1000,0.1,1,'');
         $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
+        $this->CreateVarProfile('SolarWM',1,' kWh',0,0,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
 
 		
@@ -122,7 +123,7 @@ class STECA extends IPSModule
         $this->RegisterVariableInteger('System', 'System', "");
         $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "");
         $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar");
-        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "");
+        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM");
         $this->RegisterVariableInteger('radiation', 'Einstrahlung', "");
         $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar");
         $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar");
@@ -465,7 +466,7 @@ class STECA extends IPSModule
 	    $steca_data['R3'] = '';
         $steca_data['System'] = '';
 	    $steca_data['WMZ'] = '';
-	    $steca_data['p-curr'] = '';
+	    $steca_data['p_curr'] = '';
 	    $steca_data['p_comp'] = '';
 	    $steca_data['radiation'] = '';
 	    $steca_data['TDS'] = '';
@@ -493,13 +494,28 @@ class STECA extends IPSModule
 					    SetValue($this->GetIDForIdent("T5"), $steca_data['T5']);}
             elseif ($f == 6) {$steca_data['T6'] = $s;
 						SetValue($this->GetIDForIdent("T6"), $steca_data['T6']);}
-            elseif ($f == 7) {$steca_data['R1'] = $s;
+            elseif ($f == 8) {$steca_data['R1'] = $s;
 						SetValue($this->GetIDForIdent("R1"), $steca_data['T7']);}
-            elseif ($f == 7) {$steca_data['R2'] = $s;
+            elseif ($f == 9) {$steca_data['R2'] = $s;
 						SetValue($this->GetIDForIdent("R2"), $steca_data['R2']);}
-            elseif ($f == 7) {$steca_data['R3'] = $s;
+            elseif ($f == 10) {$steca_data['R3'] = $s;
 						SetValue($this->GetIDForIdent("R3"), $steca_data['R3']);}
-            elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'YES' : 'NO';}
+            elseif ($f == 11) {$steca_data['System'] = $s;
+						SetValue($this->GetIDForIdent("System"), $steca_data['System']);}
+            elseif ($f == 12) {$steca_data['WMZ'] = $s;
+						SetValue($this->GetIDForIdent("WMZ"), $steca_data['WMZ']);}
+            elseif ($f == 13) {$steca_data['p-curr'] = $s;
+						SetValue($this->GetIDForIdent("p_curr"), $steca_data['p_curr']);}
+            elseif ($f == 14) {$steca_data['p_comp'] = $s;
+						SetValue($this->GetIDForIdent("p_comp"), $steca_data['p-comp']);}
+            elseif ($f == 16) {$steca_data['radiation'] = $s;
+						SetValue($this->GetIDForIdent("radiation"), $steca_data['radiation']);}
+            elseif ($f == 17) {$steca_data['Tds'] = $s;
+						SetValue($this->GetIDForIdent("Tds"), $steca_data['Tds']);}
+            elseif ($f == 18) {$steca_data['v_flow'] = $s;
+						SetValue($this->GetIDForIdent("v_flow"), $steca_data['v_flow']);}
+
+			elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
         }//while
  //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
         return $steca_data;
