@@ -440,20 +440,15 @@ class STECA extends IPSModule
      */
     private function parse_solar($data)
     {
-    
-        //clear record
-        //$1;1;;21,2;22,4;25,1;14,6;15,8;12,1;;24,5;37;;78;72;;75;;:50;16,0;42;8,0;455;1;0<cr><lf>
+   
         $this->debug(__FUNCTION__, 'Entered:' . $data);
         
 		//Array definieren
 		$steca_data = array();
         $records = array();
         
-//		for ($p = 0; $p < self::MAXSENSORS; $p++) {
-//            $records[$p] = array('typ' => '', 'id' => '', 'sensor' => '', 'temp' => '', 'hum' => '', 'lost' => '');
-//        }
 
-        //Felddefinitiionen
+        //Felddefinitionen
         $steca_data['Time'] = '';  
         $steca_data['T1'] = '';
         $steca_data['T2'] = '';
@@ -507,7 +502,7 @@ class STECA extends IPSModule
             elseif ($f == 13) {$steca_data['p-curr'] = $s;
 						SetValue($this->GetIDForIdent("p_curr"), $steca_data['p_curr']);}
             elseif ($f == 14) {$steca_data['p_comp'] = $s;
-						SetValue($this->GetIDForIdent("p_comp"), $steca_data['p-comp']);}
+						SetValue($this->GetIDForIdent("p_comp"), $steca_data['p_comp']);}
             elseif ($f == 16) {$steca_data['radiation'] = $s;
 						SetValue($this->GetIDForIdent("radiation"), $steca_data['radiation']);}
             elseif ($f == 17) {$steca_data['Tds'] = $s;
