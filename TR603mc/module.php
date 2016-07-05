@@ -125,6 +125,8 @@ class STECA extends IPSModule
         $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar");
         $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM");
         $this->RegisterVariableInteger('radiation', 'Einstrahlung', "");
+        $this->RegisterVariableString('Country', 'Ländercode', "");
+        $this->RegisterVariableString('Model', 'Modellvariante', "");
         $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar");
         $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar");
         $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar");
@@ -465,6 +467,9 @@ class STECA extends IPSModule
 	    $steca_data['p_curr'] = '';
 	    $steca_data['p_comp'] = '';
 	    $steca_data['radiation'] = '';
+	    $steca_data['Country'] = '';
+	    $steca_data['Model'] = '';
+	
 	    $steca_data['TDS'] = '';
 	    $steca_data['v_flow'] = '';
 	    $steca_data['Alarm'] = '';
@@ -506,12 +511,17 @@ class STECA extends IPSModule
 						SetValue($this->GetIDForIdent("p_comp"), $steca_data['p_comp']);}
             elseif ($f == 16) {$steca_data['radiation'] = $s;
 						SetValue($this->GetIDForIdent("radiation"), $steca_data['radiation']);}
-            elseif ($f == 17) {$steca_data['Tds'] = $s;
+            elseif ($f == 17) {$steca_data['Country'] = $s;
+						SetValue($this->GetIDForIdent("Country"), $steca_data['Country']);}
+            elseif ($f == 18) {$steca_data['Model'] = $s;
+						SetValue($this->GetIDForIdent("Model"), $steca_data['Model']);}
+            elseif ($f == 19) {$steca_data['Tds'] = $s;
 						SetValue($this->GetIDForIdent("Tds"), $steca_data['Tds']);}
-            elseif ($f == 20) {$steca_data['v_flow'] = $s;
+             elseif ($f == 20) {$steca_data['v_flow'] = $s;
 						SetValue($this->GetIDForIdent("v_flow"), $steca_data['v_flow']);}
 
-			elseif ($f == 19) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
+//			elseif ($f == 21) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
+  			elseif ($f == 21) {$steca_data['Alarm'] = ($s == '1') ? 'TRUE' : 'FALSE';}
         }//while
  //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
 
