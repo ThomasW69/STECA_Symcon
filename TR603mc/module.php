@@ -180,7 +180,6 @@ class STECA extends IPSModule
 	private function CreateVarProfileIntensity() {
 		if (!IPS_VariableProfileExists("Intensity.1")) {
 			IPS_CreateVariableProfile("Intensity.1", 1);
-//			IPS_SetVariableProfileIcon("Intensity.1", "Speaker");
 			IPS_SetVariableProfileAssociation("Intensity.1", 1, "An", "", 0x00FF00);
 			IPS_SetVariableProfileAssociation("Intensity.1", 0, "Aus", "", 0x808080);
 		 }
@@ -488,8 +487,10 @@ class STECA extends IPSModule
 		
         $fields = explode(';', $data);
         $f = 0;  //Positionszähler
-//        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
-        while ($f < count($fields) - 1) {
+        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
+       
+		if (count($fields) == 22){
+		while ($f < count($fields) - 1) {
             $f++;
             $s = $fields[$f];  //String puffer für feld $f
             if ($s == '') continue;
@@ -534,6 +535,7 @@ class STECA extends IPSModule
 //			elseif ($f == 21) {$steca_data['Alarm'] = ($s == 'ERR') ? 'TRUE' : 'FALSE';}
   			elseif ($f == 21) {$steca_data['Alarm'] = ($s == '1') ? 'TRUE' : 'FALSE';}
         }//while
+		}
  //       $this->debug(__CLASS__, " Parsed Data:" . print_r($steca_data, true));
 
     $this->debug(__FUNCTION__, 'Finished');
