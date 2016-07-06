@@ -103,6 +103,7 @@ class STECA extends IPSModule
         $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
         $this->CreateVarProfile('SolarWM',1,' kWh',0,0,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
+		CreateVarProfileIntensity();
 
 		
         //Vars
@@ -110,26 +111,26 @@ class STECA extends IPSModule
         IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
         $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
-        $this->RegisterVariableInteger('T1', 'T1', "TempSolar");
-        $this->RegisterVariableInteger('T2', 'T2', "TempSolar");
-        $this->RegisterVariableInteger('T3', 'T3', "TempSolar");
-        $this->RegisterVariableInteger('T4', 'T4', "TempSolar");
-        $this->RegisterVariableInteger('T5', 'T5', "TempSolar");
-        $this->RegisterVariableInteger('T6', 'T6', "TempSolar");
-        $this->RegisterVariableInteger('R1', 'R1', "~Intensity.100");
-        $this->RegisterVariableInteger('R2', 'R2', "~Intensity.100");
-        $this->RegisterVariableInteger('R3', 'R3', "~Intensity.100");
+        $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
+        $this->RegisterVariableInteger('T2', 'T2', "TempSolar",2);
+        $this->RegisterVariableInteger('T3', 'T3', "TempSolar",3);
+        $this->RegisterVariableInteger('T4', 'T4', "TempSolar",4);
+        $this->RegisterVariableInteger('T5', 'T5', "TempSolar",5);
+        $this->RegisterVariableInteger('T6', 'T6', "TempSolar",6);
+        $this->RegisterVariableInteger('R1', 'R1', "Intensity.1",7);
+        $this->RegisterVariableInteger('R2', 'R2', "Intensity.1",8);
+        $this->RegisterVariableInteger('R3', 'R3', "Intensity.1",9);
 
-        $this->RegisterVariableInteger('System', 'System', "");
-        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "");
-        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar");
-        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM");
-        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "");
-        $this->RegisterVariableString('Country', 'Ländercode', "");
-        $this->RegisterVariableString('Model', 'Modellvariante', "");
-        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar");
-        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar");
-        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar");
+        $this->RegisterVariableInteger('System', 'System', "",10);
+        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "",11);
+        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar",12);
+        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM",13);
+        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "",14);
+        $this->RegisterVariableString('Country', 'Ländercode', "",15);
+        $this->RegisterVariableString('Model', 'Modellvariante', "",16);
+        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar",17);
+        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar",18);
+        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
 
         //Timers
         $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
@@ -176,6 +177,16 @@ class STECA extends IPSModule
 		 }
 	}
 	
+	private function CreateVarProfileIntensity() {
+		if (!IPS_VariableProfileExists("Intensity.1")) {
+			IPS_CreateVariableProfile("Intensity.1", 1);
+//			IPS_SetVariableProfileIcon("Intensity.1", "Speaker");
+			IPS_SetVariableProfileAssociation("Intensity.1", 1, "An", "", 0x00FF00);
+			IPS_SetVariableProfileAssociation("Intensity.1", 0, "Aus", "", 0x808080);
+		 }
+	}
+
+
 	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
         public function ApplyChanges() {
             // Diese Zeile nicht löschen
