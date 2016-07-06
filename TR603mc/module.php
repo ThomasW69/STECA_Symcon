@@ -487,9 +487,9 @@ class STECA extends IPSModule
 		
         $fields = explode(';', $data);
         $f = 0;  //Positionszähler
-        $this->debug(__FUNCTION__, "Data: " . print_r($fields, true));
+        $this->debug(__FUNCTION__, "Data: " . print_r(count($fields), true));
        
-		if (count($fields) == 22){
+		if (count($fields) >= 20){
 		while ($f < count($fields) - 1) {
             $f++;
             $s = $fields[$f];  //String puffer für feld $f
