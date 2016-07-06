@@ -103,7 +103,7 @@ class STECA extends IPSModule
         $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
         $this->CreateVarProfile('SolarWM',1,' kWh',0,0,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
-		CreateVarProfileIntensity();
+		$this->CreateVarProfileIntensity();
 
 		
         //Vars
