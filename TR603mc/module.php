@@ -58,7 +58,7 @@ class STECA extends IPSModule
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
         "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}",
-        "StecaCutter" => "{CB6CE7C4-E576-42F6-9A2D-1D855659A34F}",
+        "StecaCutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",
         "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
     );
