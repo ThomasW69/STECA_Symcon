@@ -137,11 +137,11 @@ class STECA extends IPSModule
 //        $this->RegisterTimer('ReInit', 60000, "");
 
         //Connect Parent
-        $this->RequireParent($this->module_interfaces['SerialPort']);
+        $this->RequireParent($this->module_interfaces['Cutter']);
         $pid = $this->GetParent();
         if ($pid) {
             $name = IPS_GetName($pid);
-            if ($name == "Serial Port") IPS_SetName($pid, __CLASS__ . " Port");
+            if ($name == "StecaCutter") IPS_SetName($pid, __CLASS__ . " Port");
         }
 
         //call init if ready and activated
@@ -352,7 +352,7 @@ class STECA extends IPSModule
     private function init()
     {
         $this->debug(__FUNCTION__, 'Init entered');
-        $this->SyncParent();
+      //  $this->SyncParent();
         $this->SetBuffer('');
         $this->SetTimerInterval('ReInit', 60000);
     }
@@ -377,7 +377,7 @@ class STECA extends IPSModule
         }
         // decode Data from Device Instanz
         if (strlen($JSONString) > 0) {
-            $this->debug(__FUNCTION__, 'Data arrived:' . $JSONString);
+            $this->debug(__FUNCTION__, 'Daten empfangen:' . $JSONString);
             $this->debuglog($JSONString);
             // decode Data from IO Instanz
             $data = json_decode($JSONString);
@@ -385,7 +385,7 @@ class STECA extends IPSModule
 
             $buffer = $this->GetBuffer();
             if (is_object($data)) $data = get_object_vars($data);
-           if (isset($data['DataID'])) {
+            if (isset($data['DataID'])) {
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
      				$this->debug(__CLASS__, "decode buffer");
