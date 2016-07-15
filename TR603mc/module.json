@@ -8,7 +8,7 @@
 	  "STECA TR603mc",
 	  "STECA TR603"
 	],
-	"parentRequirements": ["{CB6CE7C4-E576-42F6-9A2D-1D855659A34F}"],
+	"parentRequirements": [],
 	"childRequirements": [],
 	"implemented": [],
 	"prefix": "STECA"
