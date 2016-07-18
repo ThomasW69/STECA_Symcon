@@ -510,7 +510,7 @@ class STECA extends IPSModule
             elseif ($f == 6) {$steca_data['T6'] = $s;
 						SetValue($this->GetIDForIdent("T6"), $steca_data['T6']);}
             elseif ($f == 8) {$steca_data['R1'] = $s;
-						SetValue($this->GetIDForIdent("R1"), $steca_data['T7']);}
+						SetValue($this->GetIDForIdent("R1"), $steca_data['R1']);}
             elseif ($f == 9) {$steca_data['R2'] = $s;
 						SetValue($this->GetIDForIdent("R2"), $steca_data['R2']);}
             elseif ($f == 10) {$steca_data['R3'] = $s;
