@@ -58,7 +58,7 @@ class STECA extends IPSModule
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
         "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}",
-        "StecaCutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",
+        "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",
         "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
     );
@@ -139,11 +139,11 @@ class STECA extends IPSModule
 //        $this->RegisterTimer('ReInit', 60000, "");
 
         //Connect Parent
-        $this->RequireParent($this->module_interfaces['StecaCutter']);
+        $this->RequireParent($this->module_interfaces['Cutter']);
         $pid = $this->GetParent();
         if ($pid) {
             $name = IPS_GetName($pid);
-            if ($name == "StecaCutter") IPS_SetName($pid, __CLASS__ . " Port");
+            if ($name == "Cutter") IPS_SetName($pid, __CLASS__ . " Port");
         }
 
         //call init if ready and activated
