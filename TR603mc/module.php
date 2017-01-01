@@ -63,6 +63,7 @@ class STECA extends IPSModule
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
     );
     protected $DEBUGLOG = '';
+	protected $useBufferVar=false;
 
 
     public function __construct($InstanceID)
@@ -109,8 +110,8 @@ class STECA extends IPSModule
 
 		
         //Vars
-        $this->RegisterVariableString('InBuffer', 'InBuffer', "", -1);
-        IPS_SetHidden($this->GetIDForIdent('InBuffer'), true);
+  //      $this->RegisterVariableString('InBuffer', 'InBuffer', "", -1);
+ //       IPS_SetHidden($this->GetIDForIdent('InBuffer'), true);
         $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
         $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
@@ -276,17 +277,55 @@ class STECA extends IPSModule
         return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
     }
 
-    protected function GetBuffer($Name)
+//    protected function GetBuffer($Name)
+ //   {
+//        $id = $this->GetIDForIdent($Name);
+//        $val = GetValueString($id);
+//        return $val;
+//    }
+	
+	 protected function GetLocalBuffer()
     {
-        $id = $this->GetIDForIdent($Name);
-        $val = GetValueString($id);
+        if($this->useBufferVar) {
+            $vid = @$this->GetIDForIdent('Buffer');
+            if (!$vid) {
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
+                IPS_SetHidden($vid, true);
+            }
+            $val = GetValueString($vid);
+        }else{
+            $val=parent::GetBuffer('LocalBuffer');
+
+        }
+        $this->debug(__FUNCTION__,'LocalBuffer returned:'.$val);
         return $val;
     }
 
-    protected function SetBuffer($Name,$Data)
+//    protected function SetBuffer($Name,$Data)
+//    {
+//        $id = $this->GetIDForIdent($Name);
+//        SetValueString($id, $Data);
+//    }
+
+
+
+    protected function SetLocalBuffer($val)
     {
-        $id = $this->GetIDForIdent($Name);
-        SetValueString($id, $Data);
+        $this->debug(__FUNCTION__, 'set LocalBuffer:' . $val);
+        if($this->useBufferVar) {
+            $vid = @$this->GetIDForIdent('Buffer');
+            if (!$vid) {
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
+                IPS_SetHidden($vid, true);
+            }
+            SetValueString($vid,$val);
+        }else {
+
+
+            parent::SetBuffer('LocalBuffer', $val);
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -357,7 +396,7 @@ class STECA extends IPSModule
     {
         $this->debug(__FUNCTION__, 'Init entered');
        // $this->SyncParent();
-        $this->SetBuffer('InBuffer','');
+        $this->SetLocalBuffer('');
         $this->SetTimerInterval('ReInit', 60000);
     }
 	
@@ -388,7 +427,7 @@ class STECA extends IPSModule
             $data = json_decode($JSONString);
             //entry for data from parent
 
-            $buffer = $this->GetBuffer('InBuffer');
+            $buffer = $this->GetLocalBuffer();
             if (is_object($data)) $data = get_object_vars($data);
             if (isset($data['DataID'])) {
                 $target = $data['DataID'];
@@ -406,7 +445,7 @@ class STECA extends IPSModule
                         $this->debug(__CLASS__, "Buffer length exceeded, dropping...");
                     }
                     $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-                    $this->SetBuffer('InBuffer',$inbuf);
+                    $this->SetLocalBuffer($inbuf);
                 }//target
             }//dataid
             else {
