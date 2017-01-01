@@ -109,8 +109,8 @@ class STECA extends IPSModule
 
 		
         //Vars
-        $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
-        IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
+        $this->RegisterVariableString('InBuffer', 'InBuffer', "", -1);
+        IPS_SetHidden($this->GetIDForIdent('InBuffer'), true);
         $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
         $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
@@ -355,7 +355,7 @@ class STECA extends IPSModule
     {
         $this->debug(__FUNCTION__, 'Init entered');
       //  $this->SyncParent();
-        $this->SetBuffer('Buffer','');
+        $this->SetBuffer('InBuffer','');
         $this->SetTimerInterval('ReInit', 60000);
     }
 	
@@ -385,25 +385,25 @@ class STECA extends IPSModule
             $data = json_decode($JSONString);
             //entry for data from parent
 
-            $buffer = $this->GetBuffer('Buffer');
+            $buffer = $this->GetBuffer('InBuffer');
             if (is_object($data)) $data = get_object_vars($data);
             if (isset($data['DataID'])) {
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
      				$this->debug(__CLASS__, "decode buffer");
-  //                  $buffer .= utf8_decode($data['Buffer']);
-                      $buffer .= $data['Buffer'];
+  //                  $buffer .= utf8_decode($data['InBuffer']);
+                      $buffer .= $data['InBuffer'];
                    
   		//		   $this->debug(__CLASS__, strToHex($buffer));
 					   $this->debug(__CLASS__, $buffer);
 					
                     $bl = strlen($buffer);
-                    if ($bl > 500) {
-                        $buffer = substr($buffer, 500);
+                    if ($bl > 100) {
+                        $buffer = substr($buffer, 100);
                         $this->debug(__CLASS__, "Buffer length exceeded, dropping...");
                     }
                     $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-                    $this->SetBuffer('Buffer',$inbuf);
+                    $this->SetBuffer('InBuffer',$inbuf);
                 }//target
             }//dataid
             else {
