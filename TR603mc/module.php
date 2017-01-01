@@ -143,7 +143,7 @@ class STECA extends IPSModule
         $pid = $this->GetParent();
         if ($pid) {
             $name = IPS_GetName($pid);
-            if ($name == "Cutter") IPS_SetName($pid, __CLASS__ . " Port");
+            if ($name == "Cutter") IPS_SetName($pid, __CLASS__ . " Cutter");
         }
 
         //call init if ready and activated
