@@ -356,7 +356,7 @@ class STECA extends IPSModule
     private function init()
     {
         $this->debug(__FUNCTION__, 'Init entered');
-        $this->SyncParent();
+       // $this->SyncParent();
         $this->SetBuffer('InBuffer','');
         $this->SetTimerInterval('ReInit', 60000);
     }
@@ -367,10 +367,11 @@ class STECA extends IPSModule
     /**
      * Data Interface from Parent(IO-RX)
      * @param string $JSONString
-     *Daten aus dem Serial port lesen
+     *Daten aus dem Cutter lesen
 	 */
     public function ReceiveData($JSONString)
     {
+        $this->debug(__FUNCTION__, 'Receivedata entered');
         //status check triggered by data
         if ($this->isActive() && $this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
