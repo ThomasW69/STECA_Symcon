@@ -274,14 +274,14 @@ class STECA extends IPSModule
         return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
     }
 
-    private function GetBuffer($Name)
+    protected function GetBuffer($Name)
     {
         $id = $this->GetIDForIdent($Name);
         $val = GetValueString($id);
         return $val;
     }
 
-    private function SetBuffer($Name,$Data)
+    protected function SetBuffer($Name,$Data)
     {
         $id = $this->GetIDForIdent($Name);
         SetValueString($id, $Data);
