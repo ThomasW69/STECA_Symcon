@@ -225,7 +225,9 @@ class STECA extends IPSModule
         if (IPS_InstanceExists($id)) {
             $instance = IPS_GetInstance($id);
             $parent = $instance['ConnectionID'];
-        } else {
+            $this->debug(__FUNCTION__, "Parent Instance #$parent ");    
+    } else {
+			
             $this->debug(__FUNCTION__, "Instance #$id doesn't exists");
         }
         return $parent;
@@ -354,7 +356,7 @@ class STECA extends IPSModule
     private function init()
     {
         $this->debug(__FUNCTION__, 'Init entered');
-      //  $this->SyncParent();
+        $this->SyncParent();
         $this->SetBuffer('InBuffer','');
         $this->SetTimerInterval('ReInit', 60000);
     }
