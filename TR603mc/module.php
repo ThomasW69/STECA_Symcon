@@ -110,8 +110,8 @@ class STECA extends IPSModule
 
 		
         //Vars
-  //      $this->RegisterVariableString('InBuffer', 'InBuffer', "", -1);
- //       IPS_SetHidden($this->GetIDForIdent('InBuffer'), true);
+        $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
+        IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
         $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
         $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
@@ -433,8 +433,8 @@ class STECA extends IPSModule
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
      				$this->debug(__CLASS__, "decode buffer");
-  //                  $buffer .= utf8_decode($data['InBuffer']);
-                      $buffer .= $data['InBuffer'];
+  //                  $buffer .= utf8_decode($data['Buffer']);
+                      $buffer .= $data['Buffer'];
                    
   		//		   $this->debug(__CLASS__, strToHex($buffer));
 					   $this->debug(__CLASS__, $buffer);
