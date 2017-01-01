@@ -274,17 +274,17 @@ class STECA extends IPSModule
         return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
     }
 
-    private function GetBuffer()
+    private function GetBuffer($Name)
     {
-        $id = $this->GetIDForIdent('Buffer');
+        $id = $this->GetIDForIdent($Name);
         $val = GetValueString($id);
         return $val;
     }
 
-    private function SetBuffer($val)
+    private function SetBuffer($Name,$Data)
     {
-        $id = $this->GetIDForIdent('Buffer');
-        SetValueString($id, $val);
+        $id = $this->GetIDForIdent($Name);
+        SetValueString($id, $Data);
     }
 
     //------------------------------------------------------------------------------
@@ -355,7 +355,7 @@ class STECA extends IPSModule
     {
         $this->debug(__FUNCTION__, 'Init entered');
       //  $this->SyncParent();
-        $this->SetBuffer('');
+        $this->SetBuffer('Buffer','');
         $this->SetTimerInterval('ReInit', 60000);
     }
 	
@@ -385,7 +385,7 @@ class STECA extends IPSModule
             $data = json_decode($JSONString);
             //entry for data from parent
 
-            $buffer = $this->GetBuffer();
+            $buffer = $this->GetBuffer('Buffer');
             if (is_object($data)) $data = get_object_vars($data);
             if (isset($data['DataID'])) {
                 $target = $data['DataID'];
@@ -403,7 +403,7 @@ class STECA extends IPSModule
                         $this->debug(__CLASS__, "Buffer length exceeded, dropping...");
                     }
                     $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-                    $this->SetBuffer($inbuf);
+                    $this->SetBuffer('Buffer',$inbuf);
                 }//target
             }//dataid
             else {
