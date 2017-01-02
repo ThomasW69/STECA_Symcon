@@ -56,7 +56,6 @@ class STECA extends IPSModule
     const VT_String = 3;
 
     protected $module_data = array();
-    protected $capvars = array();
 
     /**
      * Device action capabilities
