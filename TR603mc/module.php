@@ -447,6 +447,50 @@ class STECA extends IPSModule
         }
     }
 
+	    //------------------------------------------------------------------------------
+    /**
+     * Get Property Caplist
+     * @return string
+     */
+    protected function GetCapList()
+    {
+        return (String)@IPS_GetProperty($this->InstanceID, 'CapList');
+    }
+
+
+    //------------------------------------------------------------------------------
+    /**
+     * returns array of defined capabilities for this device
+     * Format:"cap:action;"
+     * @return array
+     */
+    protected function GetCaps()
+    {
+        $result = array();
+        //define vars
+        $caplist = $this->GetCapList();
+        $caps = explode(";", $caplist);
+        //$this->debug(__FUNCTION__,"CapVars:".print_r($this->capvars,true));
+        foreach ($caps as $tag) {
+            if(preg_match("/^\s*$/",$tag)) continue;
+            $parts=explode(":",$tag);
+            $cap=$parts[0];
+            if (isset($this->capvars[$cap])) {
+                $ident = $this->capvars[$cap]['ident'];
+                if ($ident) {
+                    $result[$cap] = $ident;
+                    if (isset($parts[1])) {
+                        $this->actions[$ident] = $parts[1];
+                    }
+                    //$this->debug(__FUNCTION__, "Cap '$cap': use Var '$ident''");
+                }//ident
+            } else {
+                $this->debug(__FUNCTION__, "Cap $cap: No Variable configured");
+            }//isset cap
+        }//for
+        return $result;
+    }//function
+
     //------------------------------------------------------------------------------
     //---Events
     //------------------------------------------------------------------------------
