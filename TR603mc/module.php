@@ -117,6 +117,15 @@ class STECA extends IPSModule
         // Diese Zeile nicht löschen
         $json=__DIR__."/module.json";
         parent::__construct($InstanceID,$json);
+        $data = @json_decode($json, true);
+        $this->module_data = $data;
+        $this->name = $data["name"];
+        if (!isset($this->name)) {
+            IPS_LogMessage(__CLASS__, "Reading Moduldata from module.json failed!");
+            return false;
+        }
+        $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
+        return true;
     }
 
     //-------------------------------------------------------------------------------
@@ -306,8 +315,7 @@ class STECA extends IPSModule
 //        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
 
         //Timers
-//       $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
-       $this->RegisterTimer('ReInit', 60000, $this->'STECA_ReInitEvent($_IPS[\'TARGET\']);');
+       $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
