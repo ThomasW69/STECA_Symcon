@@ -598,13 +598,13 @@ class STECA extends IPSModule
     {
         $this->debug(__FUNCTION__, 'Receivedata entered');
         //status check triggered by data
-        if ($this->isActive() && $this->HasActiveParent()) {
+             //trigger status check
+        if ($this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
-        } else {
-            $this->SetStatus(self::ST_INACTIV);
-            $this->debug(__FUNCTION__, 'Data arrived, but dropped because inactiv:' . $JSONString);
-            return;
+        }else{
+            $this->SetStatus(self::ST_NOPARENT);
         }
+
         // decode Data from Device Instanz
         if (strlen($JSONString) > 0) {
             $this->debug(__FUNCTION__, 'Daten empfangen:' . $JSONString);
