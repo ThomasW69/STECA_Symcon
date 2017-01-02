@@ -63,6 +63,7 @@ class STECA extends IPSModule
      * @var array $actions
      */
     protected $actions = array();
+    protected $name = '';
 
     protected $module_interfaces = array(
         //IO
