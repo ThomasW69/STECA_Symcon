@@ -9,7 +9,7 @@
 include_once(__DIR__ . "/../module_helper.php");
 
 //Klassendefinition
-class STECA extends IPSModule
+class STECA extends T2DModule
 {
     /**
      * Timer constant
