@@ -56,6 +56,15 @@ class STECA extends IPSModule
     const VT_String = 3;
 
     protected $module_data = array();
+    protected $capvars = array();
+
+    /**
+     * Device action capabilities
+     * to be overwrite in implementation
+     * @var array $actions
+     */
+    protected $actions = array();
+
     protected $module_interfaces = array(
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
@@ -488,6 +497,20 @@ class STECA extends IPSModule
                 $this->debug(__FUNCTION__, "Cap $cap: No Variable configured");
             }//isset cap
         }//for
+        return $result;
+    }//function
+
+	
+	
+	    //------------------------------------------------------------------------------
+    /**
+     * returns array of defined Actions for this device
+     * @return array
+     */
+    protected function GetActions()
+    {
+        $this->GetCaps(); //actions are assigne in caps list
+        $result = $this->actions;
         return $result;
     }//function
 
