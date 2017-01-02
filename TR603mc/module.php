@@ -306,7 +306,8 @@ class STECA extends IPSModule
 //        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
 
         //Timers
-        $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
+//       $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
+       $this->RegisterTimer('ReInit', 60000, $this->'_ReInitEvent($_IPS[\'TARGET\']);');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
