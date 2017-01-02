@@ -4,10 +4,10 @@
  *
  * IPS Module Helper Class
  *
- * @author Thomas Westerhoff
- * @copyright Thomas Westerhoff 2016
- * @version 1.0
- * @date 2016-05-03
+ * @author Thomas Dressler
+ * @copyright Thomas Dressler 2016
+ * @version 4.1.4
+ * @date 2016-10-22
  */
 //disable html errors in modules
 ini_set("html_errors", "0");
@@ -19,15 +19,32 @@ ini_set("html_errors", "0");
  * combines often used functions and constants
  *
  */
-class WTHModule extends IPSModule
+class T2DModule extends IPSModule
 {
+
     //------------------------------------------------------------------------------
     //module const and vars
     //------------------------------------------------------------------------------
     /**
+     * IPS Message IDs
+     * @see https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/nachrichten/
+     */
+    /**
+     * Kernel Message  ID
+     */
+    const IPS_KERNELMESSAGE = 10100;
+    /**
+     * Kernel Status "INIT"
+     */
+    const KR_INIT = 10102;
+    /**
      * Kernel Status "Ready"
      */
     const KR_READY = 10103;
+    /**
+     * Kernel Status "UnInit"
+     */
+    const KR_UNINIT= 10104;	//"Shutdown"-Befehl erhalten, finalisiere alles geladene
     /**
      * Module Status aktive
      */
@@ -60,6 +77,19 @@ class WTHModule extends IPSModule
      * IPS Variable Type String
      */
     const VT_String = 3;
+
+    /**
+     * Instance Message Status change
+     */
+    const IM_CHANGESTATUS=10505;//	Instance Status hat sich geändert
+    /**
+     * Variable Message Delete
+     */
+    const VM_DELETE=10602;	//Variable wurde entfernt
+    /**
+     * Variable Message Update
+     */
+    const VM_UPDATE=10603;	//Variable wurde aktualisiert
 
     /**
      * Vital module data build out of module.json
@@ -98,42 +128,53 @@ class WTHModule extends IPSModule
      */
     protected $module_interfaces = array(
         //Splitter
-     //   "WS300PC" => "{C790A7F2-2572-421F-901B-7F45C05BB062}", // WS300PC Splitter
-     //   "FS20WUE" => "{AA2544FC-0BF8-43C1-B84C-096B844AEACC}", //FS20WUE Splitter
-     //   "WDE1" => "{EE7F90DD-7668-459C-A233-8241C46864A5}", //WDE1 Splitter
-     //   "AVMAHA" => "{0837AE77-B72A-4AA6-8680-D6DDCDAEFA39}", //AVM AHA Splitter
-     //   "CUL" => "{5B0BB3C6-C35A-4438-94E4-8A6CF9EF3A4A}", //Busware CUL/CUN/COC Splitter
-     //   "NUT" => "{431281F9-77DC-46A6-8AA9-A6E2C60A5FB2}", //NUT USV Splitter
-     //   "TE923" => "{137511E0-F98B-49F3-9A6C-95234DF2E1FB}", //TE923,Ventus etc Weather Splitter
-     //   "OWN" => "{A68F9DEC-A490-4E35-B500-B45FC5F4FF6A}", //OWNet Splitter
-     //   "XS1" => "{8B015BFA-3CDD-4D45-99C8-3F250AEF1E83}", //XS1 Splitter
-     //   "WS2500PC" => "{90F68511-0628-4718-A7BF-EDBBC2BB55D4}", //WS2500 Splitter
+        "WS300PC" => "{C790A7F2-2572-421F-901B-7F45C05BB062}", // WS300PC Splitter
+        "FS20WUE" => "{AA2544FC-0BF8-43C1-B84C-096B844AEACC}", //FS20WUE Splitter
+        "WDE1" => "{EE7F90DD-7668-459C-A233-8241C46864A5}", //WDE1 Splitter
+        "AVMAHA" => "{0837AE77-B72A-4AA6-8680-D6DDCDAEFA39}", //AVM AHA Splitter
+        "CUL" => "{5B0BB3C6-C35A-4438-94E4-8A6CF9EF3A4A}", //Busware CUL/CUN/COC Splitter
+        "NUT" => "{431281F9-77DC-46A6-8AA9-A6E2C60A5FB2}", //NUT USV Splitter
+        "APCUPSD" => "{11437557-8091-4FAA-9C8B-B0AA993A1347}", //APC USV Splitter
+        "TE923" => "{137511E0-F98B-49F3-9A6C-95234DF2E1FB}", //TE923,Ventus etc Weather Splitter
+        "OWN" => "{A68F9DEC-A490-4E35-B500-B45FC5F4FF6A}", //OWNet Splitter
+        "XS1" => "{8B015BFA-3CDD-4D45-99C8-3F250AEF1E83}", //XS1 Splitter
+        "WS2500PC" => "{90F68511-0628-4718-A7BF-EDBBC2BB55D4}", //WS2500 Splitter
+        "MQTTPUB"=> "{E4CD7A6D-ADF6-4BD2-94D6-754F57037101}", //MQTT Publisher
+        "MQTTSUB"=> "{5E1B4ED3-B6E6-47D9-98E5-987A65CD651E}", //MQTT Subscriber
         
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
-        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}",
-     //   "ClientSocket" => "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}",
-
-        //devices
-     //   "FS20" => "{48FCFDC1-11A5-4309-BB0B-A0DB8042A969}", // FS20 Device
-     //   "WSDEV" => "{4228137D-EDE3-41BF-9B0A-CA0DB1AC6353}", // WS Device
-     //   "SwitchDev" => "{F2FC0924-2CE9-4067-9DB5-D228F0CCF4AD}", //Switch Device
-     //   "EnergyDev" => "{F0302960-A22D-40CC-8994-B7C40F045023}", //Energy Device
-        "STECA" => "{EFCA4FA3-74A4-4D63-A90B-17D079CBEAC0}",
-    
-        //Data Points
-     //   "FS20-TX" => "{122F60FB-BE1B-4CAB-A427-2613E4C82CBA}", //from FS20 Device
-     //   "FS20-RX" => "{DF4F0170-1C5F-4250-840C-FB5B67262530}", //to FS20 Device
-     //   "SWD-TX" => "{6FB0F652-2A47-46B1-AFC5-E327E45E59F9}", //SWDSend (from Device)
-     //   "SWD-RX" => "{E8E6E831-3C60-41CD-B05F-B9FE86A6922E}", //SWDReceive (to Device)
-     //   "WS-TX" => "{F7B329D4-6E4E-4D0C-B059-E1894B23D8CE}", //WSSend (from Device)
-     //   "WS-RX" => "{CD3D1E2D-83ED-4595-90CD-3444A22AAA66}", //WSReceive (to Device)
+        "ClientSocket" => "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}",
+        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}", //Wird eigentlich nicht benötigt, da alles über den Cutter geht
+        "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
         "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
-     //   "EN-TX" => "{63056B9B-EF14-4F65-8235-D292391AE591}", //from Energy Device
-     //   "EN-RX" => "{3C60BF34-7DD3-4234-B865-AF1606BB267C}", //to Energy Device
+
+        //devices
+        "FS20" => "{48FCFDC1-11A5-4309-BB0B-A0DB8042A969}", // FS20 Device
+        "WSDEV" => "{4228137D-EDE3-41BF-9B0A-CA0DB1AC6353}", // WS Device
+        "SwitchDev" => "{F2FC0924-2CE9-4067-9DB5-D228F0CCF4AD}", //Switch Device
+        "EnergyDev" => "{F0302960-A22D-40CC-8994-B7C40F045023}", //Energy Device
+
+        //Data Points
+        "FS20-TX" => "{122F60FB-BE1B-4CAB-A427-2613E4C82CBA}", //from FS20 Device
+        "FS20-RX" => "{DF4F0170-1C5F-4250-840C-FB5B67262530}", //to FS20 Device
+        "SWD-TX" => "{6FB0F652-2A47-46B1-AFC5-E327E45E59F9}", //SWDSend (from Device)
+        "SWD-RX" => "{E8E6E831-3C60-41CD-B05F-B9FE86A6922E}", //SWDReceive (to Device)
+        "WS-TX" => "{F7B329D4-6E4E-4D0C-B059-E1894B23D8CE}", //WSSend (from Device)
+        "WS-RX" => "{CD3D1E2D-83ED-4595-90CD-3444A22AAA66}", //WSReceive (to Device)
+        "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
+        "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
+        "EN-TX" => "{63056B9B-EF14-4F65-8235-D292391AE591}", //from Energy Device
+        "EN-RX" => "{3C60BF34-7DD3-4234-B865-AF1606BB267C}", //to Energy Device
     );
 
+    /**
+     * Use StatusVariable as buffer
+     * (if Get/SetBuffer module functions are not available in IPS <4.1)
+     * @var bool $useBufferVar
+     */
+    protected $useBufferVar=false;
 
     //------------------------------------------------------------------------------
     //Object functions
@@ -154,6 +195,7 @@ class WTHModule extends IPSModule
             IPS_LogMessage(__CLASS__, "Reading Moduldata from module.json failed!");
             return false;
         }
+        $this->useBufferVar=! (method_exists($this,'GetBuffer'));
         $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
         return true;
     }
@@ -355,7 +397,7 @@ class WTHModule extends IPSModule
         //use logmessages instead of debug because this isnt available in early stage
         $caps = $this->GetCaps();
         $actions= $this->GetActions();
-        IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") entered for Caps:".print_r($caps,true)."Actions:".print_r($actions,true));
+        IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") entered");
         if (count($caps) < 1) {
             IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Caps empty");
             return;
@@ -495,6 +537,53 @@ class WTHModule extends IPSModule
             return;
         }
         IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Error Variable $ident not found");
+    }
+
+    //------------------------------------------------------------------------------
+    /**
+     * Get status variable Buffer
+     * contains incoming data from IO, act as regVar
+     * @return String
+     */
+    protected function GetLocalBuffer()
+    {
+        if($this->useBufferVar) {
+            $vid = @$this->GetIDForIdent('Buffer');
+            if (!$vid) {
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
+                IPS_SetHidden($vid, true);
+            }
+            $val = GetValueString($vid);
+        }else{
+            $val=parent::GetBuffer('LocalBuffer');
+
+        }
+        $this->debug(__FUNCTION__,'LocalBuffer returned:'.$val);
+        return $val;
+    }
+
+    //------------------------------------------------------------------------------
+    /**
+     * Set status variable Buffer
+     * @param String $val
+     */
+    protected function SetLocalBuffer($val)
+    {
+        $this->debug(__FUNCTION__, 'set LocalBuffer:' . $val);
+        if($this->useBufferVar) {
+            $vid = @$this->GetIDForIdent('Buffer');
+            if (!$vid) {
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
+                IPS_SetHidden($vid, true);
+            }
+            SetValueString($vid,$val);
+        }else {
+
+
+            parent::SetBuffer('LocalBuffer', $val);
+        }
     }
 
     //------------------------------------------------------------------------------

@@ -3,8 +3,10 @@
 //Steca Solarregler Modul
 // Thomas Westerhoff
 
-//html errors in modulen abschalten
-ini_set("html_errors", "0");
+/**
+ * common module helper function
+ */
+include_once(__DIR__ . "/../module_helper.php");
 
 //Klassendefinition
 class STECA extends IPSModule
@@ -14,70 +16,12 @@ class STECA extends IPSModule
      * maxage of LastUpdate in sec before ReInit
      */
 	 
+ 
+    //------------------------------------------------------------------------------
+    //module const and vars
+    //------------------------------------------------------------------------------
     const MAXAGE = 300;
-    //------------------------------------------------------------------------------
-    //module const and vars
-    //------------------------------------------------------------------------------
-    /**
-     * Kernel Status "Ready"
-     */
-    const KR_READY = 10103;
-    /**
-     * Module Status aktive
-     */
-    const ST_AKTIV = 102;
-    /**
-     * Module Status "inactive"
-     */
-    const ST_INACTIV = 104;
-    /**
-     * Module Status "Error"
-     */
-    const ST_ERROR = 201;
-    /**
-     * Custom Module Status "NoParent"
-     */
-    const ST_NOPARENT = 202;
-    /**
-     * IPS Variable Type Boolean
-     */
-    const VT_Boolean = 0;
-    /**
-     * IPS Variable Type Integer
-     */
-    const VT_Integer = 1;
-    /**
-     * IPS Variable Type Float
-     */
-    const VT_Float = 2;
-    /**
-     * IPS Variable Type String
-     */
-    const VT_String = 3;
 
-    protected $module_data = array();
-
-    /**
-     * Device action capabilities
-     * to be overwrite in implementation
-     * @var array $actions
-     */
-    protected $actions = array();
-    protected $name = '';
-
-    protected $module_interfaces = array(
-        //IO
-        "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
-        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}", //Wird eigentlich nicht benötigt, da alles über den Cutter geht
-        "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
-        "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
-        "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
-    );
-    protected $DEBUGLOG = '';
-	protected $useBufferVar=True;
-	    //------------------------------------------------------------------------------
-    //module const and vars
-    //------------------------------------------------------------------------------
     ///[capvars]
     /**
      * mapping array for capabilities to variables
@@ -111,7 +55,6 @@ class STECA extends IPSModule
     ///[capvars]
 
 
-
     public function __construct($InstanceID)
     {
         // Diese Zeile nicht löschen
@@ -124,137 +67,11 @@ class STECA extends IPSModule
             IPS_LogMessage(__CLASS__, "Reading Moduldata from module.json failed!");
             return false;
         }
+        $this->useBufferVar=! (method_exists($this,'GetBuffer'));
         $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
         return true;
     }
 
-    //-------------------------------------------------------------------------------
-    /**
-     * Check profile by name if exists, else create
-     * @param String $pname Name
-     * @param integer $typ Variable Typ (0..3)
-     * @param String $prefix Prefix before value
-     * @param String $suffix Suffix after value
-     * @param String $icon Icon Name
-     * @param integer $min min value
-     * @param integer $max max value
-     * @param integer $step step value
-     * @param integer $digit digits for formatting
-     * @param boolean $drop drop existing profile first
-     */
-    protected function check_profile($pname, $typ, $prefix, $suffix, $icon, $min, $max, $step, $digit = 0, $drop = false)
-    {
-        //use logmessages instead of debug because this isnt available in early stage
-        if (IPS_VariableProfileExists($pname) && $drop) IPS_DeleteVariableProfile($pname);
-        if (!IPS_VariableProfileExists($pname)) {
-            IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Create VariableProfile $pname");
-            if (IPS_CreateVariableProfile($pname, $typ)) {
-                IPS_SetVariableProfileText($pname, $prefix, $suffix);
-                if (isset($min) && isset($max) && isset($step)) {
-                    IPS_SetVariableProfileValues($pname, $min, $max, $step);
-                }
-                if (isset($digit)) {
-                    IPS_SetVariableProfileDigits($pname, $digit);
-                }
-                if ($icon) {
-                    IPS_SetVariableProfileIcon($pname, $icon);
-                }
-            } else {
-                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Cannot Create VariableProfile $pname");
-            }
-        }
-    }
-
-    //------------------------------------------------------------------------------
-    /**
-     * create status variables out of capvar definitions from device
-     */
-    protected function CreateStatusVars()
-    {
-        //use logmessages instead of debug because this isnt available in early stage
-        $vid = 0;
-        $caps = $this->capvars;
-        //IPS_LogMessage(__CLASS__,__FUNCTION__. "::ID #".$this->InstanceID. " Caps ".print_r($caps,true));
-        foreach (array_keys($caps) as $cap) {
-            $var = $caps[$cap];
-            $type = $var["type"];
-            switch ($type) {
-                case self::VT_Boolean:
-                    $vid = $this->RegisterVariableBoolean($var["ident"], $var["name"], $var["profile"], $var["pos"]);
-                    break;
-                case self::VT_Integer:
-                    $vid = $this->RegisterVariableInteger($var["ident"], $var["name"], $var["profile"], $var["pos"]);
-                    break;
-                case self::VT_Float:
-                    $vid = $this->RegisterVariableFloat($var["ident"], $var["name"], $var["profile"], $var["pos"]);
-                    break;
-                case self::VT_String:
-                    $vid = $this->RegisterVariableString($var["ident"], $var["name"], $var["profile"], $var["pos"]);
-                    break;
-                default:
-                    //IPS_LogMessage(__CLASS__,__FUNCTION__."(#".$this->InstanceID.") Unknown Typ ($type)");
-
-            }
-            if ($vid) {
-                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Create Variable for Cap $cap ( $vid)");
-            } else {
-
-                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.")  Create Variable failed");
-            }
-
-
-        }
-
-    }
-
-
-    //------------------------------------------------------------------------------
-    /**
-     * remove variables not matching actual capabilities
-     */
-
-    protected function SetStatusVariables()
-    {
-        //use logmessages instead of debug because this isnt available in early stage
-        $caps = $this->GetCaps();
-        $actions= $this->GetActions();
-        IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") entered");
-        if (count($caps) < 1) {
-            IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Caps empty");
-            return;
-        }
-        foreach (array_keys($this->capvars) as $cap) {
-            $var = $this->capvars[$cap];
-            $ident = $var["ident"];
-            $id = @$this->GetIDForIdent($ident);
-            if ($id > 0) {
-                IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") Maintain Var for Cap $cap");
-                if (!isset($caps[$cap])) {
-                    $this->drop_var($ident);
-                } else {
-                    if (isset($var["hidden"])) {
-                        IPS_SetHidden($id, $var["hidden"]);
-                    }//hidden
-                    if (isset($actions[$cap])) {
-                        $action = $actions[$cap];
-                        //if (is_bool($action)) {
-                        if ($action) {
-                            IPS_LogMessage($this->name,__FUNCTION__."(#".$this->InstanceID.") Enable Standard Action for $cap");
-                            $this->EnableAction($cap);
-                        } else {
-                            //IPS_LogMessage($this->name,__FUNCTION__."Disable Standard Action for $cap");
-                            $this->DisableAction($cap);
-                        }
-                        //}
-                    }//actiom
-                }//caps
-            } else {
-                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.")  Var with Ident $ident not found");
-            }//id
-        }//for
-    }//function
-	
-	
 	
 
     public function Create()
@@ -289,30 +106,8 @@ class STECA extends IPSModule
         $this->CreateStatusVars();
 
         //Vars
-     //   $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
         IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
-//      $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
-//        $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
-//        $this->RegisterVariableInteger('T2', 'T2', "TempSolar",2);
-//        $this->RegisterVariableInteger('T3', 'T3', "TempSolar",3);
-//        $this->RegisterVariableInteger('T4', 'T4', "TempSolar",4);
-//        $this->RegisterVariableInteger('T5', 'T5', "TempSolar",5);
-//        $this->RegisterVariableInteger('T6', 'T6', "TempSolar",6);
-//        $this->RegisterVariableInteger('R1', 'R1', "Intensity.1",7);
-//        $this->RegisterVariableInteger('R2', 'R2', "Intensity.1",8);
-//        $this->RegisterVariableInteger('R3', 'R3', "Intensity.1",9);
-//
-//        $this->RegisterVariableInteger('System', 'System', "",10);
-//        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "",11);
-//        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar",12);
-//        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM",13);
-//        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "",14);
-//        $this->RegisterVariableString('Country', 'Ländercode', "",15);
-//        $this->RegisterVariableString('Model', 'Modellvariante', "",16);
-//        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar",17);
-//        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar",18);
-//        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
 
         //Timers
        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
@@ -367,6 +162,17 @@ class STECA extends IPSModule
 	}
 
 
+		
+    //--------------------------------------------------------
+    /**
+     * Destructor
+     */
+    public function Destroy()
+    {
+        parent::Destroy();
+    }
+
+    //------------------------------------------------------------------------------
 	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
      public function ApplyChanges()
     {
@@ -383,187 +189,7 @@ class STECA extends IPSModule
         $this->SetStatusVariables(); //Update Variables
         $this->SetReceiveDataFilter(".*");
     }
-		
-    //--------------------------------------------------------
-    /**
-     * Destructor
-     */
-    public function Destroy()
-    {
-        parent::Destroy();
-    }
 	
-    //------------------------------------------------------------------------------
-    /**
-     * Check if a parent for Instance $id exists
-     * @param $id integer InstanceID
-     * @return integer
-     */
-    protected function GetParent($id = 0)
-    {
-        $parent = 0;
-        if ($id == 0) $id = $this->InstanceID;
-        if (IPS_InstanceExists($id)) {
-            $instance = IPS_GetInstance($id);
-            $parent = $instance['ConnectionID'];
-            $this->debug(__FUNCTION__, "Parent Instance #$parent ");    
-    } else {
-			
-            $this->debug(__FUNCTION__, "Instance #$id doesn't exists");
-        }
-        return $parent;
-    }
-
-
-    protected function HasActiveParent($id = 0)
-    {
-        if ($id == 0) $id = $this->InstanceID;
-        $parent = $this->GetParent($id);
-        if ($parent > 0) {
-            $status = $this->GetInstanceStatus($parent);
-            if ($status == self::ST_AKTIV) {
-                return true;
-            } else {
-                //IPS_SetInstanceStatus($id, self::ST_NOPARENT);
-                $this->debug(__FUNCTION__, "Parent not active for Instance #" . $id);
-                return false;
-            }
-        }
-        $this->debug(__FUNCTION__, "No Parent for Instance #" . $id);
-        return false;
-    }
-	
-    //--------------------------------------------------------
-    /**
-     * Check if the given Instance is active
-     * @param int $id
-     * @return bool
-     */
-    protected function isActive($id = 0)
-    {
-        if ($id == 0) $id = $this->InstanceID;
-        $res = (bool)IPS_GetProperty($id, 'Active');
-        return $res;
-    }
-	
-    private function GetLogFile()
-    {
-        return (String)IPS_GetProperty($this->InstanceID, 'LogFile');
-    }
-
-
-    private function GetParentCategory()
-    {
-        return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
-    }
-
-   //------------------------------------------------------------------------------
-    /**
-     * Get status variable Buffer
-     * contains incoming data from IO, act as regVar
-     * @return String
-     */
-	
-	 protected function GetLocalBuffer()
-    {
-        if($this->useBufferVar) {
-            $vid = @$this->GetIDForIdent('Buffer');
-            if (!$vid) {
-                $this->RegisterVariableString('Buffer','Buffer','',-1);
-                $vid=$this->GetIDForIdent('Buffer');
-                IPS_SetHidden($vid, true);
-            }
-            $val = GetValueString($vid);
-        }else{
-            $val=parent::GetBuffer('LocalBuffer');
-
-        }
-        $this->debug(__FUNCTION__,'LocalBuffer returned:'.$val);
-        return $val;
-    }
-
-
-    //------------------------------------------------------------------------------
-    /**
-     * Set status variable Buffer
-     * @param String $val
-     */
-
-    protected function SetLocalBuffer($val)
-    {
-        $this->debug(__FUNCTION__, 'set LocalBuffer:' . $val);
-        if($this->useBufferVar) {
-            $vid = @$this->GetIDForIdent('Buffer');
-            if (!$vid) {
-                $this->RegisterVariableString('Buffer','Buffer','',-1);
-                $vid=$this->GetIDForIdent('Buffer');
-                IPS_SetHidden($vid, true);
-            }
-            SetValueString($vid,$val);
-        }else {
-
-
-            parent::SetBuffer('LocalBuffer', $val);
-        }
-    }
-
-	    //------------------------------------------------------------------------------
-    /**
-     * Get Property Caplist
-     * @return string
-     */
-    protected function GetCapList()
-    {
-        return (String)@IPS_GetProperty($this->InstanceID, 'CapList');
-    }
-
-
-    //------------------------------------------------------------------------------
-    /**
-     * returns array of defined capabilities for this device
-     * Format:"cap:action;"
-     * @return array
-     */
-    protected function GetCaps()
-    {
-        $result = array();
-        //define vars
-        $caplist = $this->GetCapList();
-        $caps = explode(";", $caplist);
-        //$this->debug(__FUNCTION__,"CapVars:".print_r($this->capvars,true));
-        foreach ($caps as $tag) {
-            if(preg_match("/^\s*$/",$tag)) continue;
-            $parts=explode(":",$tag);
-            $cap=$parts[0];
-            if (isset($this->capvars[$cap])) {
-                $ident = $this->capvars[$cap]['ident'];
-                if ($ident) {
-                    $result[$cap] = $ident;
-                    if (isset($parts[1])) {
-                        $this->actions[$ident] = $parts[1];
-                    }
-                    //$this->debug(__FUNCTION__, "Cap '$cap': use Var '$ident''");
-                }//ident
-            } else {
-                $this->debug(__FUNCTION__, "Cap $cap: No Variable configured");
-            }//isset cap
-        }//for
-        return $result;
-    }//function
-
-	
-	
-	    //------------------------------------------------------------------------------
-    /**
-     * returns array of defined Actions for this device
-     * @return array
-     */
-    protected function GetActions()
-    {
-        $this->GetCaps(); //actions are assigne in caps list
-        $result = $this->actions;
-        return $result;
-    }//function
 
     //------------------------------------------------------------------------------
     //---Events
@@ -588,42 +214,6 @@ class STECA extends IPSModule
         }
     }
 
-    //------------------------------------------------------------------------------
-    //device functions
-    //------------------------------------------------------------------------------
-    /**
-     * Set IO properties
-     */
-    private function SyncParent()
-    {
-        $ParentID = $this->GetParent();
-        if ($ParentID > 0) {
-            $this->debug(__FUNCTION__, 'entered');
-            $ParentInstance = IPS_GetInstance($ParentID);
-            if ($ParentInstance['ModuleInfo']['ModuleID'] == $this->module_interfaces['SerialPort']) {
-                if (IPS_GetProperty($ParentID, 'DataBits') <> 8)
-                    IPS_SetProperty($ParentID, 'DataBits', 8);
-                if (IPS_GetProperty($ParentID, 'StopBits') <> 1)
-                    IPS_SetProperty($ParentID, 'StopBits', 1);
-                if (IPS_GetProperty($ParentID, 'BaudRate') <> 9600)
-                    IPS_SetProperty($ParentID, 'BaudRate', 9600);
-                if (IPS_GetProperty($ParentID, 'Parity') <> 'None')
-                    IPS_SetProperty($ParentID, 'Parity', "None");
-
-                if (IPS_HasChanges($ParentID)) {
-                    IPS_SetProperty($ParentID, 'Open', false);
-                    @IPS_ApplyChanges($ParentID);
-                    IPS_Sleep(200);
-                    $port = IPS_GetProperty($ParentID, 'Port');
-                    if ($port) {
-                        IPS_SetProperty($ParentID, 'Open', true);
-                        @IPS_ApplyChanges($ParentID);
-                    }
-                }
-            }//serialPort
-        }//parentID
-    }//function
-	
 	
     //------------------------------------------------------------------------------
     /**
@@ -827,55 +417,7 @@ class STECA extends IPSModule
     return $steca_data;
     }//function
 
-    /**
-     * Log an debug message
-     * PHP modules cannot enter data to debug window,use messages instead
-     * @param $topic
-     * @param $data
-     */
-    protected function debug($topic, $data)
-    {
-        if (method_exists($this,"SendDebug")) {
-            //available as of #150 (2016-04-22)
-            $this->SendDebug($topic,$data,0);
-        }
-    }
-    //------------------------------------------------------------------------------
-    /**
-     * check if debug is enabled
-     * @return bool
-     */
-    protected function isDebug()
-    {
-        $debug = @IPS_GetProperty($this->InstanceID, 'Debug');
-        return ($debug === true);
-    }
-    //--------------------------------------------------------
-    /**
-     * Log Debug to its own file
-     * @param $data
-     */
-    protected function debuglog($data)
-    {
-        if (!$this->isDebug()) return;
-        $fname = $this->DEBUGLOG;
-        $o = @fopen($fname, "a");
-        if (!$o) {
-            $this->debug(__FUNCTION__, 'Cannot open ' . $fname);
-            return;
-        }
-        fwrite($o, $data . "\n");
-        fclose($o);
-    }
-	
-    protected function GetInstanceStatus($id = 0)
-    {
-        if ($id == 0) $id = $this->InstanceID;
-        $inst = IPS_GetInstance($id);
-        return $inst['InstanceStatus'];
-    }
-	
-
+ 
 	
 }//class
 ?>
