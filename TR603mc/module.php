@@ -3,7 +3,7 @@
 //Steca Solarregler Modul
 // Thomas Westerhoff
 
-/html errors in modulen abschalten
+//html errors in modulen abschalten
 ini_set("html_errors", "0");
 
 //Klassendefinition
