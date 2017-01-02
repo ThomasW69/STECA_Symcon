@@ -3,6 +3,8 @@
 //Steca Solarregler Modul
 // Thomas Westerhoff
 
+/html errors in modulen abschalten
+ini_set("html_errors", "0");
 
 //Klassendefinition
 class STECA extends IPSModule
@@ -57,87 +59,203 @@ class STECA extends IPSModule
     protected $module_interfaces = array(
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
-        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}",
-        "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",
+        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}", //Wird eigentlich nicht benötigt, da alles über den Cutter geht
+        "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
         "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
     );
     protected $DEBUGLOG = '';
 	protected $useBufferVar=false;
+	    //------------------------------------------------------------------------------
+    //module const and vars
+    //------------------------------------------------------------------------------
+    ///[capvars]
+    /**
+     * mapping array for capabilities to variables
+     * @var array $capvars
+     */
+    protected $capvars = array(
+        'Buffer'=>array("ident"=>'Buffer',"type"=>self::VT_String,"name"=>'Buffer','profile'=>'~String',"pos"=>-1),
+        'LastUpdate'=>array("ident"=>'LastUpdate',"type"=>self::VT_String,"name"=>'LastUpdate','profile'=>'~String',"pos"=>0),
+        'Name'=>array("ident"=>'Name',"type"=>self::VT_String,"name"=>'Name','profile'=>'~String',"pos"=>0),
+        "T1" => array("ident" => 'T1', "type" => self::VT_Integer, "name" => 'T1', "profile" => 'TempSolar', "pos" => 0),
+        "T2" => array("ident" => 'T2', "type" => self::VT_Integer, "name" => 'T2', "profile" => 'TempSolar', "pos" => 1),
+        "T3" => array("ident" => 'T3', "type" => self::VT_Integer, "name" => 'T3', "profile" => 'TempSolar', "pos" => 2),
+        "T4" => array("ident" => 'T4', "type" => self::VT_Integer, "name" => 'T4', "profile" => 'TempSolar', "pos" => 3),
+        "T5" => array("ident" => 'T5', "type" => self::VT_Integer, "name" => 'T5', "profile" => 'TempSolar', "pos" => 4),
+        "T6" => array("ident" => 'T6', "type" => self::VT_Integer, "name" => 'T6', "profile" => 'TempSolar', "pos" => 5),
+        "R1" => array("ident" => 'R1', "type" => self::VT_Integer, "name" => 'R1', "profile" => 'Intensity.1', "pos" => 6),
+        "R2" => array("ident" => 'R2', "type" => self::VT_Integer, "name" => 'R2', "profile" => 'Intensity.1', "pos" => 7),
+        "R3" => array("ident" => 'R3', "type" => self::VT_Integer, "name" => 'R3', "profile" => 'Intensity.1', "pos" => 8),
+        "System" => array("ident" => 'System', "type" => self::VT_Integer, "name" => 'System', "profile" => '', "pos" => 9),
+        "WMZ" => array("ident" => 'WMZ', "type" => self::VT_Boolean, "name" => 'Wärmemengenzählung', "profile" => '', "pos" => 10),
+        "p_curr" => array("ident" => 'p_curr', "type" => self::VT_Float, "name" => 'Momentanleistung', "profile" => 'PowSolar', "pos" => 11),
+        "p_comp" => array("ident" => 'p_comp', "type" => self::VT_Integer, "name" => 'Gesamtwärmemenge', "profile" => 'SolarWM', "pos" => 12),
+        "radiation" => array("ident" => 'radiation', "type" => self::VT_Integer, "name" => 'Einstrahlung', "profile" => '', "pos" => 13),
+        "Country" => array("ident" => 'Country', "type" => self::VT_String, "name" => 'Ländercode', "profile" => '~String', "pos" => 14),
+        "Model" => array("ident" => 'Model', "type" => self::VT_String, "name" => 'Modellvariante', "profile" => '~String', "pos" => 15),
+        "Tds" => array("ident" => "Tds", "type" => self::VT_Integer, "name" => 'temperatur Direktsensor', "profile" => 'TempSolar', "pos" => 16), //reversed state
+        "v_flow" => array("ident" => "v_flow", "type" => self::VT_Integer, "name" => 'Volumenstrom', "profile" => 'FlowSolar', "pos" => 17),
+        "Alarm" => array("ident" => "alarm", "type" => self::VT_Boolean, "name" => 'Alarm', "profile" => 'AlarmSolar', "pos" => 18)
+
+    );
+    ///[capvars]
+
 
 
     public function __construct($InstanceID)
     {
         // Diese Zeile nicht löschen
-        $json_file = __DIR__ . "/module.json";
-
-        parent::__construct($InstanceID);
-        $json = @file_get_contents($json_file);
-        $data = @json_decode($json, true);
-        $this->module_data = $data;
-        $this->name = $data["name"];
-        if (!isset($this->name)) {
-            IPS_LogMessage(__CLASS__, "Reading Moduldata from module.json failed!");
-            return false;
-        }
-        $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
+        $json=__DIR__."/module.json";
+        parent::__construct($InstanceID,$json);
     }
+
+    //-------------------------------------------------------------------------------
+    /**
+     * Check profile by name if exists, else create
+     * @param String $pname Name
+     * @param integer $typ Variable Typ (0..3)
+     * @param String $prefix Prefix before value
+     * @param String $suffix Suffix after value
+     * @param String $icon Icon Name
+     * @param integer $min min value
+     * @param integer $max max value
+     * @param integer $step step value
+     * @param integer $digit digits for formatting
+     * @param boolean $drop drop existing profile first
+     */
+    protected function check_profile($pname, $typ, $prefix, $suffix, $icon, $min, $max, $step, $digit = 0, $drop = false)
+    {
+        //use logmessages instead of debug because this isnt available in early stage
+        if (IPS_VariableProfileExists($pname) && $drop) IPS_DeleteVariableProfile($pname);
+        if (!IPS_VariableProfileExists($pname)) {
+            IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Create VariableProfile $pname");
+            if (IPS_CreateVariableProfile($pname, $typ)) {
+                IPS_SetVariableProfileText($pname, $prefix, $suffix);
+                if (isset($min) && isset($max) && isset($step)) {
+                    IPS_SetVariableProfileValues($pname, $min, $max, $step);
+                }
+                if (isset($digit)) {
+                    IPS_SetVariableProfileDigits($pname, $digit);
+                }
+                if ($icon) {
+                    IPS_SetVariableProfileIcon($pname, $icon);
+                }
+            } else {
+                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Cannot Create VariableProfile $pname");
+            }
+        }
+    }
+
+
+    //------------------------------------------------------------------------------
+    /**
+     * remove variables not matching actual capabilities
+     */
+
+    protected function SetStatusVariables()
+    {
+        //use logmessages instead of debug because this isnt available in early stage
+        $caps = $this->GetCaps();
+        $actions= $this->GetActions();
+        IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") entered");
+        if (count($caps) < 1) {
+            IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Caps empty");
+            return;
+        }
+        foreach (array_keys($this->capvars) as $cap) {
+            $var = $this->capvars[$cap];
+            $ident = $var["ident"];
+            $id = @$this->GetIDForIdent($ident);
+            if ($id > 0) {
+                IPS_LogMessage($this->name, __FUNCTION__ ."(#".$this->InstanceID.") Maintain Var for Cap $cap");
+                if (!isset($caps[$cap])) {
+                    $this->drop_var($ident);
+                } else {
+                    if (isset($var["hidden"])) {
+                        IPS_SetHidden($id, $var["hidden"]);
+                    }//hidden
+                    if (isset($actions[$cap])) {
+                        $action = $actions[$cap];
+                        //if (is_bool($action)) {
+                        if ($action) {
+                            IPS_LogMessage($this->name,__FUNCTION__."(#".$this->InstanceID.") Enable Standard Action for $cap");
+                            $this->EnableAction($cap);
+                        } else {
+                            //IPS_LogMessage($this->name,__FUNCTION__."Disable Standard Action for $cap");
+                            $this->DisableAction($cap);
+                        }
+                        //}
+                    }//actiom
+                }//caps
+            } else {
+                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.")  Var with Ident $ident not found");
+            }//id
+        }//for
+    }//function
+	
+	
+	
 
     public function Create()
     {
         // Diese Zeile nicht löschen.
         parent::Create();
 		
+		// register property
+        $this->RegisterPropertyString('DeviceID', '');
+        $this->RegisterPropertyString('Typ', '');
+        $this->RegisterPropertyString('Class', '');
+        $this->RegisterPropertyString('CapList', '');
+        $this->RegisterPropertyBoolean('Debug', false);
         //Properties
 		$this->RegisterPropertyString('Category', 'STECA Devices');
         $this->RegisterPropertyInteger('ParentCategory', 0); //parent cat is root
         $this->RegisterPropertyInteger('ParentInstance', 0); //parent cat is root
         $this->RegisterPropertyString('LogFile', '');
         $this->RegisterPropertyBoolean('AutoCreate', true);
-        $this->RegisterPropertyBoolean('Debug', false);
+
         $this->RegisterPropertyBoolean('Active', false);
 
 		//VariablenProfile
-	   // CreateVarProfile($name, $ProfileType, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Icon) {
+        $this->check_profile('TempSolar', 1, "", " °C", "Temperature", -200, +500, 1, 0, false);
+        $this->check_profile('PowSolar', 2, "", " kW", "", 0, +1000, 0.1, 0, false);
+        $this->check_profile('FlowSolar', 1, "", " l/min", "", 0, +50, 1, 0, false);
+        $this->check_profile('SolarWM', 1, "", " kWh", "", 0, 0, 1, 0, false);
 
-//		$this->CreateVarProfile("WGW.Rainfall", 2, " Liter/m²" ,0 , 10, 0 , 2, "Rainfall");
-		$this->CreateVarProfile('TempSolar',1,' °C', -200, 500, 1,0,"Temperature");
-        $this->CreateVarProfile('PowSolar',2,' kW',0,1000,0.1,1,'');
-        $this->CreateVarProfile('FlowSolar',1,' l/min',0,50,1,0,'');
-        $this->CreateVarProfile('SolarWM',1,' kWh',0,0,1,0,'');
 		$this->CreateVarProfileAlarmSolar();
 		$this->CreateVarProfileIntensity();
 
-		
-        //Vars
-        $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
-        IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
-        $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
-        IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
-        $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
-        $this->RegisterVariableInteger('T2', 'T2', "TempSolar",2);
-        $this->RegisterVariableInteger('T3', 'T3', "TempSolar",3);
-        $this->RegisterVariableInteger('T4', 'T4', "TempSolar",4);
-        $this->RegisterVariableInteger('T5', 'T5', "TempSolar",5);
-        $this->RegisterVariableInteger('T6', 'T6', "TempSolar",6);
-        $this->RegisterVariableInteger('R1', 'R1', "Intensity.1",7);
-        $this->RegisterVariableInteger('R2', 'R2', "Intensity.1",8);
-        $this->RegisterVariableInteger('R3', 'R3', "Intensity.1",9);
+        $this->CreateStatusVars();
 
-        $this->RegisterVariableInteger('System', 'System', "",10);
-        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "",11);
-        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar",12);
-        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM",13);
-        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "",14);
-        $this->RegisterVariableString('Country', 'Ländercode', "",15);
-        $this->RegisterVariableString('Model', 'Modellvariante', "",16);
-        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar",17);
-        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar",18);
-        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
+        //Vars
+     //   $this->RegisterVariableString('Buffer', 'Buffer', "", -1);
+        IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
+//      $this->RegisterVariableString('LastUpdate', 'LastUpdate', "", -4);
+        IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
+//        $this->RegisterVariableInteger('T1', 'T1', "TempSolar",1);
+//        $this->RegisterVariableInteger('T2', 'T2', "TempSolar",2);
+//        $this->RegisterVariableInteger('T3', 'T3', "TempSolar",3);
+//        $this->RegisterVariableInteger('T4', 'T4', "TempSolar",4);
+//        $this->RegisterVariableInteger('T5', 'T5', "TempSolar",5);
+//        $this->RegisterVariableInteger('T6', 'T6', "TempSolar",6);
+//        $this->RegisterVariableInteger('R1', 'R1', "Intensity.1",7);
+//        $this->RegisterVariableInteger('R2', 'R2', "Intensity.1",8);
+//        $this->RegisterVariableInteger('R3', 'R3', "Intensity.1",9);
+//
+//        $this->RegisterVariableInteger('System', 'System', "",10);
+//        $this->RegisterVariableBoolean('WMZ', 'Wärmemengenzählung', "",11);
+//        $this->RegisterVariableFloat('p_curr', 'Momentanleistung', "PowSolar",12);
+//        $this->RegisterVariableInteger('p_comp', 'Gesamtwärmemenge', "SolarWM",13);
+//        $this->RegisterVariableInteger('radiation', 'Einstrahlung', "",14);
+//        $this->RegisterVariableString('Country', 'Ländercode', "",15);
+//        $this->RegisterVariableString('Model', 'Modellvariante', "",16);
+//        $this->RegisterVariableInteger('Tds', 'Temperatur Direktsensor', "TempSolar",17);
+//        $this->RegisterVariableInteger('v_flow', 'Volumenstrom', "FlowSolar",18);
+//        $this->RegisterVariableBoolean('Alarm', 'Alarm', "AlarmSolar",19);
 
         //Timers
         $this->RegisterTimer('ReInit', 60000, $this->module_data["prefix"] . '_ReInitEvent($_IPS[\'TARGET\']);');
-//        $this->RegisterTimer('ReInit', 60000, "");
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
@@ -190,19 +308,21 @@ class STECA extends IPSModule
 
 
 	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
-        public function ApplyChanges() {
-            // Diese Zeile nicht löschen
-            parent::ApplyChanges();
-			
-          if ($this->isActive() && $this->HasActiveParent()) {
-            $this->SetStatus(self::ST_AKTIV);
-            $this->init();
-        } else {
-            $this->SetStatus(self::ST_INACTIV);
-            $this->SetTimerInterval('ReInit', 0);
+     public function ApplyChanges()
+    {
+        // Diese Zeile nicht loeschen
+        parent::ApplyChanges();
+        if (IPS_GetKernelRunlevel() == self::KR_READY) {
+            if ($this->HasActiveParent()) {
+                $this->SetStatus(self::ST_AKTIV);
+            }else{
+                $this->SetStatus(self::ST_NOPARENT);
+            } //check status
         }
-
-        }
+        //must be here!!
+        $this->SetStatusVariables(); //Update Variables
+        $this->SetReceiveDataFilter(".*");
+    }
 		
     //--------------------------------------------------------
     /**
@@ -277,12 +397,12 @@ class STECA extends IPSModule
         return (Integer)IPS_GetProperty($this->InstanceID, 'ParentCategory');
     }
 
-//    protected function GetBuffer($Name)
- //   {
-//        $id = $this->GetIDForIdent($Name);
-//        $val = GetValueString($id);
-//        return $val;
-//    }
+   //------------------------------------------------------------------------------
+    /**
+     * Get status variable Buffer
+     * contains incoming data from IO, act as regVar
+     * @return String
+     */
 	
 	 protected function GetLocalBuffer()
     {
@@ -302,13 +422,12 @@ class STECA extends IPSModule
         return $val;
     }
 
-//    protected function SetBuffer($Name,$Data)
-//    {
-//        $id = $this->GetIDForIdent($Name);
-//        SetValueString($id, $Data);
-//    }
 
-
+    //------------------------------------------------------------------------------
+    /**
+     * Set status variable Buffer
+     * @param String $val
+     */
 
     protected function SetLocalBuffer($val)
     {
@@ -417,7 +536,7 @@ class STECA extends IPSModule
         } else {
             $this->SetStatus(self::ST_INACTIV);
             $this->debug(__FUNCTION__, 'Data arrived, but dropped because inactiv:' . $JSONString);
-            return;
+            return;x
         }
         // decode Data from Device Instanz
         if (strlen($JSONString) > 0) {
