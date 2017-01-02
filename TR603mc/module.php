@@ -536,7 +536,7 @@ class STECA extends IPSModule
         } else {
             $this->SetStatus(self::ST_INACTIV);
             $this->debug(__FUNCTION__, 'Data arrived, but dropped because inactiv:' . $JSONString);
-            return;x
+            return;
         }
         // decode Data from Device Instanz
         if (strlen($JSONString) > 0) {
