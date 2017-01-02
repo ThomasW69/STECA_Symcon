@@ -156,6 +156,48 @@ class STECA extends IPSModule
         }
     }
 
+    //------------------------------------------------------------------------------
+    /**
+     * create status variables out of capvar definitions from device
+     */
+    protected function CreateStatusVars()
+    {
+        //use logmessages instead of debug because this isnt available in early stage
+        $vid = 0;
+        $caps = $this->capvars;
+        //IPS_LogMessage(__CLASS__,__FUNCTION__. "::ID #".$this->InstanceID. " Caps ".print_r($caps,true));
+        foreach (array_keys($caps) as $cap) {
+            $var = $caps[$cap];
+            $type = $var["type"];
+            switch ($type) {
+                case self::VT_Boolean:
+                    $vid = $this->RegisterVariableBoolean($var["ident"], $var["name"], $var["profile"], $var["pos"]);
+                    break;
+                case self::VT_Integer:
+                    $vid = $this->RegisterVariableInteger($var["ident"], $var["name"], $var["profile"], $var["pos"]);
+                    break;
+                case self::VT_Float:
+                    $vid = $this->RegisterVariableFloat($var["ident"], $var["name"], $var["profile"], $var["pos"]);
+                    break;
+                case self::VT_String:
+                    $vid = $this->RegisterVariableString($var["ident"], $var["name"], $var["profile"], $var["pos"]);
+                    break;
+                default:
+                    //IPS_LogMessage(__CLASS__,__FUNCTION__."(#".$this->InstanceID.") Unknown Typ ($type)");
+
+            }
+            if ($vid) {
+                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.") Create Variable for Cap $cap ( $vid)");
+            } else {
+
+                IPS_LogMessage($this->name, __FUNCTION__ . "(#".$this->InstanceID.")  Create Variable failed");
+            }
+
+
+        }
+
+    }
+
 
     //------------------------------------------------------------------------------
     /**
