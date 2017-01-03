@@ -275,6 +275,9 @@ class STECA extends T2DModule
                         $myType = $this->GetType();
                         $myClass = $this->GetClass();
                         //nur wenn die Daten für mich bestimmt sind
+                        $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
+                        $this->debug(__FUNCTION__, "$myID(Typ:$myTyp,Class:$myClass)");
+
 						if (($myID == $Device) && ($myType == $typ) && ($myClass == $class)) {
                             $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
                             $st_data = $data['Buffer'];
@@ -283,6 +286,9 @@ class STECA extends T2DModule
 							//$this->ParseData($ws_data);
 							$steca_data = $this->parse_solar($st_data);
                         }
+						else {
+                            $this->debug(__FUNCTION__, "IDs passen nicht");
+						}
 
                     } else {
                         $this->debug(__FUNCTION__, 'Interface Data Error');
