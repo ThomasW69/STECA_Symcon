@@ -222,7 +222,6 @@ class STECA extends T2DModule
     private function init()
     {
         $this->debug(__FUNCTION__, 'Init entered');
-       // $this->SyncParent();
         $this->SetLocalBuffer('');
         $this->SetTimerInterval('ReInit', 60000);
     }
@@ -233,6 +232,7 @@ class STECA extends T2DModule
     /**
      * Data Interface from Parent(IO-RX)
      * @param string $JSONString
+     *Daten aus dem Cutter lesen
      *Daten aus dem Cutter lesen
 	 */
     public function ReceiveData($JSONString)
