@@ -111,7 +111,7 @@ class STECA extends T2DModule
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
 
         //Timers
-        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent;');
+        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\'];');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
@@ -190,7 +190,7 @@ class STECA extends T2DModule
         }
         //must be here!!
         $this->SetStatusVariables(); //Update Variables
-        $this->SetReceiveDataFilter(".*");
+        $this->SetReceiveDataFilter(".*TR0603.*");
     }
 	
 
