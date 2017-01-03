@@ -181,16 +181,22 @@ class STECA extends T2DModule
     {
         // Diese Zeile nicht loeschen
         parent::ApplyChanges();
+
+        $this->debug(__FUNCTION__, "ApplyChanges");
+		
         if (IPS_GetKernelRunlevel() == self::KR_READY) {
             if ($this->HasActiveParent()) {
                 $this->SetStatus(self::ST_AKTIV);
+                $this->debug(__FUNCTION__, "Status Aktiv");
             }else{
                 $this->SetStatus(self::ST_NOPARENT);
+				$this->debug(__FUNCTION__, "NoParent");
+
             } //check status
         }
         //must be here!!
         $this->SetStatusVariables(); //Update Variables
-        $this->SetReceiveDataFilter(".*TR0603.*");
+       // $this->SetReceiveDataFilter(".*TR0603.*");
     }
 	
 
