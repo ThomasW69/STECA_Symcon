@@ -267,28 +267,28 @@ class STECA extends T2DModule
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
                     if (isset($data['Buffer'])) {
-                        $Device = $data['DeviceID'];
-                        $typ = $data['Typ'];
-                        $class = $data['Class'];
-                        //call data point
-                        $myID = $this->GetDeviceID();
-                        $myType = $this->GetType();
-                        $myClass = $this->GetClass();
-                        //nur wenn die Daten für mich bestimmt sind
-                        $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
-                        $this->debug(__FUNCTION__, "$myID(Typ:$myTyp,Class:$myClass)");
+                    //    $Device = $data['DeviceID'];
+                    //    $typ = $data['Typ'];
+                    //    $class = $data['Class'];
+                    //    //call data point
+                    //    $myID = $this->GetDeviceID();
+                    //    $myType = $this->GetType();
+                    //    $myClass = $this->GetClass();
+                    //    //nur wenn die Daten für mich bestimmt sind
+                    //    $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
+                    //    $this->debug(__FUNCTION__, "$myID(Typ:$myTyp,Class:$myClass)");
 
-						if (($myID == $Device) && ($myType == $typ) && ($myClass == $class)) {
-                            $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
+					//	if (($myID == $Device) && ($myType == $typ) && ($myClass == $class)) {
+                    //       $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
                             $st_data = $data['Buffer'];
-                            if (is_object($st_data)) $st_data = get_object_vars($st_data);
+                    //        if (is_object($st_data)) $st_data = get_object_vars($st_data);
                             
 							//$this->ParseData($ws_data);
 							$steca_data = $this->parse_solar($st_data);
-                        }
-						else {
-                            $this->debug(__FUNCTION__, "IDs passen nicht");
-						}
+                     //   }
+					//	else {
+                    //        $this->debug(__FUNCTION__, "IDs passen nicht");
+					//	}
 
                     } else {
                         $this->debug(__FUNCTION__, 'Interface Data Error');
