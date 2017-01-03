@@ -230,7 +230,7 @@ class STECA extends T2DModule
     private function init()
     {
         $this->debug(__FUNCTION__, 'Init entered');
-        $this->SetLocalBuffer('');
+       // $this->SetLocalBuffer('');
         $this->SetTimerInterval('ReInit', 60000);
 		$pid = $this->GetParent();
         $this->debug(__FUNCTION__, "ParentID ist $pid");
@@ -248,8 +248,7 @@ class STECA extends T2DModule
     public function ReceiveData($JSONString)
     {
         $this->debug(__FUNCTION__, 'Receivedata entered');
-        //status check triggered by data
-             //trigger status check
+       //trigger status check
         if ($this->HasActiveParent()) {
             $this->SetStatus(self::ST_AKTIV);
         }else{
@@ -258,41 +257,43 @@ class STECA extends T2DModule
 
         // decode Data from Device Instanz
         if (strlen($JSONString) > 0) {
-            $this->debug(__FUNCTION__, 'Daten empfangen:' . $JSONString);
-            $this->debuglog($JSONString);
+            // decode Data from IO Instanz
+            $this->debug(__FUNCTION__, 'Data arrived:' . $JSONString);
+            //$this->debuglog($JSONString);
             // decode Data from IO Instanz
             $data = json_decode($JSONString);
             //entry for data from parent
-
-            $buffer = $this->GetLocalBuffer();
             if (is_object($data)) $data = get_object_vars($data);
             if (isset($data['DataID'])) {
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
-     				$this->debug(__CLASS__, "decode buffer");
-  //                  $buffer .= utf8_decode($data['Buffer']);
-                      $buffer .= $data['Buffer'];
-                   
-  		//		   $this->debug(__CLASS__, strToHex($buffer));
-					   $this->debug(__CLASS__, $buffer);
-					
-                    $bl = strlen($buffer);
-                    if ($bl > 100) {
-                        $buffer = substr($buffer, 100);
-                        $this->debug(__CLASS__, "Buffer length exceeded, dropping...");
+                    if (isset($data['WSData']) && isset($data['DeviceID'])) {
+                        $Device = $data['DeviceID'];
+                        $typ = $data['Typ'];
+                        $class = $data['Class'];
+                        //call data point
+                        $myID = $this->GetDeviceID();
+                        $myType = $this->GetType();
+                        $myClass = $this->GetClass();
+                        //nur wenn die Daten für mich bestimmt sind
+						if (($myID == $Device) && ($myType == $typ) && ($myClass == $class)) {
+                            $this->debug(__FUNCTION__, "$Device(Typ:$typ,Class:$class)");
+                            $st_data = $data['Buffer'];
+                            if (is_object($st_data)) $st_data = get_object_vars($st_data);
+                            
+							//$this->ParseData($ws_data);
+							$steca_data = $this->parse_solar($st_data);
+                        }
+
+                    } else {
+                        $this->debug(__FUNCTION__, 'Interface Data Error');
                     }
-                    $inbuf = $this->ReadRecord($buffer); //returns remaining chars
-                    $this->SetLocalBuffer($inbuf);
-                }//target
-            }//dataid
-            else {
-                $this->debug(__FUNCTION__, 'No DataID supplied');
-            }//dataid
+                }
+            }
         } else {
             $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
-        }//else len json
-    }//func
-
+        }
+    }
 	
 	
 	

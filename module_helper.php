@@ -549,8 +549,8 @@ class T2DModule extends IPSModule
         if($this->useBufferVar) {
             $vid = @$this->GetIDForIdent('Buffer');
             if (!$vid) {
-                $this->RegisterVariableString('LocalBuffer','LocalBuffer','',-1);
-                $vid=$this->GetIDForIdent('LocalBuffer');
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
                 IPS_SetHidden($vid, true);
             }
             $val = GetValueString($vid);
@@ -570,10 +570,10 @@ class T2DModule extends IPSModule
     protected function SetLocalBuffer($val)
     {
         if($this->useBufferVar) {
-            $vid = @$this->GetIDForIdent('LocalBuffer');
+            $vid = @$this->GetIDForIdent('Buffer');
             if (!$vid) {
-                $this->RegisterVariableString('LocalBuffer','LocalBuffer','',-1);
-                $vid=$this->GetIDForIdent('LocalBuffer');
+                $this->RegisterVariableString('Buffer','Buffer','',-1);
+                $vid=$this->GetIDForIdent('Buffer');
                 IPS_SetHidden($vid, true);
             }
             SetValueString($vid,$val);
