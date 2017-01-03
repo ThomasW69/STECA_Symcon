@@ -243,7 +243,6 @@ class STECA extends T2DModule
      * Data Interface from Parent(IO-RX)
      * @param string $JSONString
      *Daten aus dem Cutter lesen
-     *Daten aus dem Cutter lesen
 	 */
     public function ReceiveData($JSONString)
     {
@@ -267,7 +266,7 @@ class STECA extends T2DModule
             if (isset($data['DataID'])) {
                 $target = $data['DataID'];
                 if ($target == $this->module_interfaces['IO-RX']) {
-                    if (isset($data['WSData']) && isset($data['DeviceID'])) {
+                    if (isset($data['Buffer'])) {
                         $Device = $data['DeviceID'];
                         $typ = $data['Typ'];
                         $class = $data['Class'];
