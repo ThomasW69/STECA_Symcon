@@ -147,8 +147,6 @@ class T2DModule extends IPSModule
         "ClientSocket" => "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}",
         "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}", //Wird eigentlich nicht benötigt, da alles über den Cutter geht
         "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
-        "IO-RX" => "{018EF6B5-AB94-40C6-AA53-46943E824ACF}", //from VirtIO
-        "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
 
         //devices
         "FS20" => "{48FCFDC1-11A5-4309-BB0B-A0DB8042A969}", // FS20 Device
@@ -167,6 +165,7 @@ class T2DModule extends IPSModule
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
         "EN-TX" => "{63056B9B-EF14-4F65-8235-D292391AE591}", //from Energy Device
         "EN-RX" => "{3C60BF34-7DD3-4234-B865-AF1606BB267C}", //to Energy Device
+		
     );
 
     /**
