@@ -86,9 +86,10 @@ class STECA extends T2DModule
         $this->RegisterPropertyString('CapList', '');
         $this->RegisterPropertyBoolean('Debug', false);
         //Properties
-		$this->RegisterPropertyString('Category', 'STECA Devices');
+		//muss nochmal aufgeräumt werden
+ 		$this->RegisterPropertyString('Category', 'STECA Devices');
         $this->RegisterPropertyInteger('ParentCategory', 0); //parent cat is root
-        $this->RegisterPropertyInteger('ParentInstance', 0); //parent cat is root
+        $this->RegisterPropertyInteger('ParentInstance', 0); 
         $this->RegisterPropertyString('LogFile', '');
         $this->RegisterPropertyBoolean('AutoCreate', true);
 
@@ -105,20 +106,22 @@ class STECA extends T2DModule
 
         $this->CreateStatusVars();
 
-        //Vars
+        //hide some Vars
         IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
 
         //Timers
-       $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
+        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent;');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
         $pid = $this->GetParent();
+        $this->debug(__FUNCTION__, "ParentID: $pid");
+		
         if ($pid) {
             $name = IPS_GetName($pid);
             if ($name == "Cutter") IPS_SetName($pid, __CLASS__ . " Cutter");
-        }
+			}
 
         //call init if ready and activated
         if (IPS_GetKernelRunlevel() == self::KR_READY) {
@@ -224,6 +227,8 @@ class STECA extends T2DModule
         $this->debug(__FUNCTION__, 'Init entered');
         $this->SetLocalBuffer('');
         $this->SetTimerInterval('ReInit', 60000);
+		$pid = $this->GetParent();
+        $this->debug(__FUNCTION__, "ParentID ist $pid");
     }
 	
 
