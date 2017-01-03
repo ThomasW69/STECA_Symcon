@@ -111,7 +111,7 @@ class STECA extends T2DModule
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
 
         //Timers
-        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\'];');
+        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
@@ -187,7 +187,6 @@ class STECA extends T2DModule
         if (IPS_GetKernelRunlevel() == self::KR_READY) {
             if ($this->HasActiveParent()) {
                 $this->SetStatus(self::ST_AKTIV);
-                $this->debug(__FUNCTION__, "Status Aktiv");
             }else{
                 $this->SetStatus(self::ST_NOPARENT);
 				$this->debug(__FUNCTION__, "NoParent");

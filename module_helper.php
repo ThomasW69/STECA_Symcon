@@ -173,7 +173,7 @@ class T2DModule extends IPSModule
      * (if Get/SetBuffer module functions are not available in IPS <4.1)
      * @var bool $useBufferVar
      */
-    protected $useBufferVar=false;
+    protected $useBufferVar=true;
 
     //------------------------------------------------------------------------------
     //Object functions
@@ -549,8 +549,8 @@ class T2DModule extends IPSModule
         if($this->useBufferVar) {
             $vid = @$this->GetIDForIdent('Buffer');
             if (!$vid) {
-                $this->RegisterVariableString('Buffer','Buffer','',-1);
-                $vid=$this->GetIDForIdent('Buffer');
+                $this->RegisterVariableString('LocalBuffer','LocalBuffer','',-1);
+                $vid=$this->GetIDForIdent('LocalBuffer');
                 IPS_SetHidden($vid, true);
             }
             $val = GetValueString($vid);
@@ -569,12 +569,11 @@ class T2DModule extends IPSModule
      */
     protected function SetLocalBuffer($val)
     {
-        $this->debug(__FUNCTION__, 'set LocalBuffer:' . $val);
         if($this->useBufferVar) {
-            $vid = @$this->GetIDForIdent('Buffer');
+            $vid = @$this->GetIDForIdent('LocalBuffer');
             if (!$vid) {
-                $this->RegisterVariableString('Buffer','Buffer','',-1);
-                $vid=$this->GetIDForIdent('Buffer');
+                $this->RegisterVariableString('LocalBuffer','LocalBuffer','',-1);
+                $vid=$this->GetIDForIdent('LocalBuffer');
                 IPS_SetHidden($vid, true);
             }
             SetValueString($vid,$val);
