@@ -359,7 +359,7 @@ class STECA extends T2DModule
             elseif ($f == 13) {$steca_data['p_curr'] = intval($s)/10;
 						SetValue($this->GetIDForIdent("p_curr"), $steca_data['p_curr']);}
             elseif ($f == 14) {$steca_data['p_comp'] = $s;
-						       if (($steca_data['p_comp']!=2) || ($steca_data['p_comp']!=32767)) {SetValue($this->GetIDForIdent("p_comp"), $steca_data['p_comp']);}}
+						       if (($steca_data['p_comp']!=2) || ($steca_data['p_comp']!=32767))  {SetValue($this->GetIDForIdent("p_comp"), $steca_data['p_comp']);}}
             elseif ($f == 15) {$steca_data['radiation'] = $s;
 						SetValue($this->GetIDForIdent("radiation"), $steca_data['radiation']);}
             elseif ($f == 16) {$steca_data['Country'] = $s;
