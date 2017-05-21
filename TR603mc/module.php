@@ -40,7 +40,7 @@ class STECA extends T2DModule
         "R1" => array("ident" => 'R1', "type" => self::VT_Integer, "name" => 'R1', "profile" => 'Intensity.1', "pos" => 6),
         "R2" => array("ident" => 'R2', "type" => self::VT_Integer, "name" => 'R2', "profile" => 'Intensity.1', "pos" => 7),
         "R3" => array("ident" => 'R3', "type" => self::VT_Integer, "name" => 'R3', "profile" => 'Intensity.1', "pos" => 8),
-        "System" => array("ident" => 'System', "type" => self::VT_Integer, "name" => 'System', "profile" => '', "pos" => 9),
+        "System" => array("ident" => 'System', "type" => self::VT_Integer, "name" => 'System', "profile" => '', "pos" => 9),  
         "WMZ" => array("ident" => 'WMZ', "type" => self::VT_Boolean, "name" => 'Wärmemengenzählung', "profile" => '', "pos" => 10),
         "p_curr" => array("ident" => 'p_curr', "type" => self::VT_Float, "name" => 'Momentanleistung', "profile" => 'PowSolar', "pos" => 11),
         "p_comp" => array("ident" => 'p_comp', "type" => self::VT_Integer, "name" => 'Gesamtwärmemenge', "profile" => 'SolarWM', "pos" => 12),
@@ -335,7 +335,7 @@ class STECA extends T2DModule
             if ($s == '') continue;
             $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
             if ($f ==1) {$steca_data['T1'] = $s;
-		    SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
+		                SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
             elseif ($f == 2) {$steca_data['T2'] = $s;
 					    SetValue($this->GetIDForIdent("T2"), $steca_data['T2']);}
             elseif ($f == 3) {$steca_data['T3'] = $s;
@@ -370,7 +370,10 @@ class STECA extends T2DModule
             elseif ($f == 18) {$steca_data['Model'] = $s;
 						SetValue($this->GetIDForIdent("Model"), $steca_data['Model']);}
             elseif ($f == 19) {$steca_data['Tds'] = $s;
-						SetValue($this->GetIDForIdent("Tds"), $steca_data['Tds']);}
+			                   if ($steca_data['Tds']!='Err') {
+						       SetValue($this->GetIDForIdent("Tds"), $steca_data['Tds']);
+							   }
+			                  }
              elseif ($f == 20) {$steca_data['v_flow'] = $s;
 						SetValue($this->GetIDForIdent("v_flow"), $steca_data['v_flow']);}
 
