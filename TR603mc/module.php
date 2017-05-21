@@ -319,7 +319,7 @@ class STECA extends T2DModule
 	    $steca_data['Country'] = '';
 	    $steca_data['Model'] = '';
 	
-	    $steca_data['TDS'] = '';
+	    $steca_data['Tds'] = '';
 	    $steca_data['v_flow'] = '';
 	    $steca_data['Alarm'] = '';
 		
