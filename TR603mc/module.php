@@ -347,7 +347,7 @@ class STECA extends T2DModule
 					     SetValue($this->GetIDForIdent("T3"), $steca_data['T3']);}
 			            }
             elseif ($f == 4) {$steca_data['T4'] = $s;
-			             if ($steca_data['T4']>='0') && ($steca_data['T4']<='200'){
+			             if (($steca_data['T4']>='0') && ($steca_data['T4']<='200')){
 					     SetValue($this->GetIDForIdent("T4"), $steca_data['T4']);}
 			             }
             elseif ($f == 5) {$steca_data['T5'] = $s;
