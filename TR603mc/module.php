@@ -335,17 +335,29 @@ class STECA extends T2DModule
             if ($s == '') continue;
             $this->debug(__CLASS__, 'Field:' . $f . '=' . $s);
             if ($f ==1) {$steca_data['T1'] = $s;
-		                SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
+			             if ($steca_data['T1']>='0') and ($steca_data['T1']<='200'){
+		                 SetValue($this->GetIDForIdent("T1"), $steca_data['T1']);}
+			            }
             elseif ($f == 2) {$steca_data['T2'] = $s;
-					    SetValue($this->GetIDForIdent("T2"), $steca_data['T2']);}
+			             if ($steca_data['T2']>='0') and ($steca_data['T2']<='200'){
+					     SetValue($this->GetIDForIdent("T2"), $steca_data['T2']);}
+			            }
             elseif ($f == 3) {$steca_data['T3'] = $s;
-					    SetValue($this->GetIDForIdent("T3"), $steca_data['T3']);}
+			             if ($steca_data['T3']>='0') and ($steca_data['T3']<='200'){
+					     SetValue($this->GetIDForIdent("T3"), $steca_data['T3']);}
+			            }
             elseif ($f == 4) {$steca_data['T4'] = $s;
-					    SetValue($this->GetIDForIdent("T4"), $steca_data['T4']);}
+			             if ($steca_data['T4']>='0') and ($steca_data['T4']<='200'){
+					     SetValue($this->GetIDForIdent("T4"), $steca_data['T4']);}
+			             }
             elseif ($f == 5) {$steca_data['T5'] = $s;
-					    SetValue($this->GetIDForIdent("T5"), $steca_data['T5']);}
+			             if ($steca_data['T5']>='0') and ($steca_data['T5']<='200'){
+					     SetValue($this->GetIDForIdent("T5"), $steca_data['T5']);}
+			            }
             elseif ($f == 6) {$steca_data['T6'] = $s;
-						SetValue($this->GetIDForIdent("T6"), $steca_data['T6']);}
+			             if ($steca_data['T6']>='0') and ($steca_data['T6']<='200'){
+						 SetValue($this->GetIDForIdent("T6"), $steca_data['T6']);}
+			            }
             elseif ($f == 8) {$steca_data['R1'] = $s;
 						SetValue($this->GetIDForIdent("R1"), $steca_data['R1']);}
             elseif ($f == 9) {$steca_data['R2'] = $s;
