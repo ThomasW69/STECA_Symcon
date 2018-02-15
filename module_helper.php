@@ -148,6 +148,7 @@ class T2DModule extends IPSModule
         "ClientSocket" => "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}",
         "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
 
+		
         //devices
         "FS20" => "{48FCFDC1-11A5-4309-BB0B-A0DB8042A969}", // FS20 Device
         "WSDEV" => "{4228137D-EDE3-41BF-9B0A-CA0DB1AC6353}", // WS Device
