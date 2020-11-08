@@ -2,9 +2,9 @@
 "id": "{690AD0DC-FE3B-4F37-9AC2-E068DE369D22}",
 "author": "Thomas Westerhoff",
 "name": "STECA Solarregler",
-"url": "http://www.astrohome.info",
+"url": "",
 "compatibility": {
-        "version": "4.2",
+        "version": "5.0",
         "date": 1491343200
     },
 "version": "5.5",  
