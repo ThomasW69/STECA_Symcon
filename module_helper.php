@@ -5,9 +5,9 @@
  * IPS Module Helper Class
  *
  * @author Thomas Dressler
- * @copyright Thomas Dressler 2016
- * @version 4.1.4
- * @date 2016-10-22
+ * @copyright Thomas Dressler 2016-2018
+ * @version 5.0.1
+ * @date 2018-08-18
  */
 //disable html errors in modules
 ini_set("html_errors", "0");
@@ -144,8 +144,8 @@ class T2DModule extends IPSModule
         
         //IO
         "VirtIO" => "{6179ED6A-FC31-413C-BB8E-1204150CF376}",
+        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}",
         "ClientSocket" => "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}",
-        "SerialPort" => "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}", //Wird eigentlich nicht benötigt, da alles über den Cutter geht
         "Cutter" => "{AC6C6E74-C797-40B3-BA82-F135D941D1A2}",//Eigentlicher Cutter als Parent instanz
 
         //devices
@@ -165,7 +165,6 @@ class T2DModule extends IPSModule
         "IO-TX" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", //to VirtIO
         "EN-TX" => "{63056B9B-EF14-4F65-8235-D292391AE591}", //from Energy Device
         "EN-RX" => "{3C60BF34-7DD3-4234-B865-AF1606BB267C}", //to Energy Device
-		
     );
 
     /**
@@ -173,7 +172,7 @@ class T2DModule extends IPSModule
      * (if Get/SetBuffer module functions are not available in IPS <4.1)
      * @var bool $useBufferVar
      */
-    protected $useBufferVar=true;
+    protected $useBufferVar=false;
 
     //------------------------------------------------------------------------------
     //Object functions
@@ -569,6 +568,7 @@ class T2DModule extends IPSModule
      */
     protected function SetLocalBuffer($val)
     {
+        $this->debug(__FUNCTION__, 'set LocalBuffer:' . $val);
         if($this->useBufferVar) {
             $vid = @$this->GetIDForIdent('Buffer');
             if (!$vid) {
