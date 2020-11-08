@@ -1,14 +1,10 @@
 {
 	"elements":
 	[
-		
-		{ "name": "Active", "type": "CheckBox", "caption": "Activate Instance" },
-		{ "name": "Category", "type": "ValidationTextBox", "caption": "Category Name" },
-		{ "name": "ParentCategory", "type": "NumberSpinner", "caption": "Category Parent" },
-        { "type": "ParentInstance", "name": "PropertyInstanceID", "caption": "parent instance" },
-		{ "type": "Label", "label": "-- optional settings ---------" },
-		{ "name": "LogFile", "type": "ValidationTextBox", "caption": "LogFile (full qualified)" },
-		{ "name": "Debug", "type": "CheckBox", "caption": "Debuginfo schreiben" }
+    	{ "name": "DeviceID", "type": "ValidationTextBox", "caption": "DeviceID" },
+		{ "name": "Typ", "type": "ValidationTextBox", "caption": "Typ" },
+        { "name": "Class", "type": "ValidationTextBox", "caption": "Creator" },
+		{ "name": "CounterFactor", "type": "NumberSpinner", "caption": "Correction Factor", "digits": 3}
 
 	]
 }
