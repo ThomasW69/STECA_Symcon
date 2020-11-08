@@ -6,7 +6,7 @@
 /**
  * common module helper function
  */
-include_once(__DIR__ . "/../module_helper.php");
+include_once(__DIR__ . "/../libs/module_helper.php");
 
 //Klassendefinition
 class STECA extends T2DModule
@@ -28,29 +28,28 @@ class STECA extends T2DModule
      * @var array $capvars
      */
     protected $capvars = array(
-        'Buffer'=>array("ident"=>'Buffer',"type"=>self::VT_String,"name"=>'Buffer','profile'=>'~String',"pos"=>-1),
-        'LastUpdate'=>array("ident"=>'LastUpdate',"type"=>self::VT_String,"name"=>'LastUpdate','profile'=>'~String',"pos"=>0),
-        'Name'=>array("ident"=>'Name',"type"=>self::VT_String,"name"=>'Name','profile'=>'~String',"pos"=>0),
-        "T1" => array("ident" => 'T1', "type" => self::VT_Integer, "name" => 'T1', "profile" => 'TempSolar', "pos" => 0),
-        "T2" => array("ident" => 'T2', "type" => self::VT_Integer, "name" => 'T2', "profile" => 'TempSolar', "pos" => 1),
-        "T3" => array("ident" => 'T3', "type" => self::VT_Integer, "name" => 'T3', "profile" => 'TempSolar', "pos" => 2),
-        "T4" => array("ident" => 'T4', "type" => self::VT_Integer, "name" => 'T4', "profile" => 'TempSolar', "pos" => 3),
-        "T5" => array("ident" => 'T5', "type" => self::VT_Integer, "name" => 'T5', "profile" => 'TempSolar', "pos" => 4),
-        "T6" => array("ident" => 'T6', "type" => self::VT_Integer, "name" => 'T6', "profile" => 'TempSolar', "pos" => 5),
-        "R1" => array("ident" => 'R1', "type" => self::VT_Integer, "name" => 'R1', "profile" => 'Intensity.1', "pos" => 6),
-        "R2" => array("ident" => 'R2', "type" => self::VT_Integer, "name" => 'R2', "profile" => 'Intensity.1', "pos" => 7),
-        "R3" => array("ident" => 'R3', "type" => self::VT_Integer, "name" => 'R3', "profile" => 'Intensity.1', "pos" => 8),
-        "System" => array("ident" => 'System', "type" => self::VT_Integer, "name" => 'System', "profile" => '', "pos" => 9),
-        "WMZ" => array("ident" => 'WMZ', "type" => self::VT_Boolean, "name" => 'Wärmemengenzählung', "profile" => '', "pos" => 10),
-        "p_curr" => array("ident" => 'p_curr', "type" => self::VT_Float, "name" => 'Momentanleistung', "profile" => 'PowSolar', "pos" => 11),
-        "p_comp" => array("ident" => 'p_comp', "type" => self::VT_Integer, "name" => 'Gesamtwärmemenge', "profile" => 'SolarWM', "pos" => 12),
-        "radiation" => array("ident" => 'radiation', "type" => self::VT_Integer, "name" => 'Einstrahlung', "profile" => '', "pos" => 13),
-        "Country" => array("ident" => 'Country', "type" => self::VT_String, "name" => 'Ländercode', "profile" => '~String', "pos" => 14),
-        "Model" => array("ident" => 'Model', "type" => self::VT_String, "name" => 'Modellvariante', "profile" => '~String', "pos" => 15),
-        "Tds" => array("ident" => "Tds", "type" => self::VT_Integer, "name" => 'temperatur Direktsensor', "profile" => 'TempSolar', "pos" => 16), //reversed state
-        "v_flow" => array("ident" => "v_flow", "type" => self::VT_Integer, "name" => 'Volumenstrom', "profile" => 'FlowSolar', "pos" => 17),
-        "Alarm" => array("ident" => "alarm", "type" => self::VT_Boolean, "name" => 'Alarm', "profile" => 'AlarmSolar', "pos" => 18)
-
+        'Buffer' 	=>	array("ident" =>'Buffer',		"type" => self::VT_String,	"name"=>'Buffer',					"profile"=>'~String',		"pos" => -1),
+        'LastUpdate'=>	array("ident" =>'LastUpdate',	"type" => self::VT_String,	"name"=>'LastUpdate',				"profile"=>'~String',		"pos" => 0),
+        'Name'		=>	array("ident" =>'Name',			"type" => self::VT_String,  "name"=>'Name', 					"profile"=>'~String',		"pos" => 0),
+        "T1" 		=> 	array("ident" => 'T1', 			"type" => self::VT_Integer, "name" => 'T1', 					"profile" => 'TempSolar', 	"pos" => 0),
+        "T2" 		=> 	array("ident" => 'T2', 			"type" => self::VT_Integer, "name" => 'T2', 					"profile" => 'TempSolar', 	"pos" => 1),
+        "T3" 		=> 	array("ident" => 'T3', 			"type" => self::VT_Integer, "name" => 'T3', 					"profile" => 'TempSolar', 	"pos" => 2),
+        "T4" 		=> 	array("ident" => 'T4', 			"type" => self::VT_Integer, "name" => 'T4', 					"profile" => 'TempSolar', 	"pos" => 3),
+        "T5" 		=> 	array("ident" => 'T5', 			"type" => self::VT_Integer, "name" => 'T5', 					"profile" => 'TempSolar', 	"pos" => 4),
+        "T6" 		=> 	array("ident" => 'T6', 			"type" => self::VT_Integer, "name" => 'T6', 					"profile" => 'TempSolar', 	"pos" => 5),
+        "R1" 		=> 	array("ident" => 'R1', 			"type" => self::VT_Integer, "name" => 'R1', 					"profile" => 'Intensity.1', "pos" => 6),
+        "R2" 		=> 	array("ident" => 'R2', 			"type" => self::VT_Integer, "name" => 'R2', 					"profile" => 'Intensity.1', "pos" => 7),
+        "R3" 		=> 	array("ident" => 'R3', 			"type" => self::VT_Integer, "name" => 'R3', 					"profile" => 'Intensity.1', "pos" => 8),
+        "System" 	=> 	array("ident" => 'System', 		"type" => self::VT_Integer, "name" => 'System', 				"profile" => '', 			"pos" => 9),
+        "WMZ" 		=> 	array("ident" => 'WMZ', 		"type" => self::VT_Boolean, "name" => 'Wärmemengenzählung', 	"profile" => '', 			"pos" => 10),
+        "p_curr" 	=> 	array("ident" => 'p_curr', 		"type" => self::VT_Float, 	"name" => 'Momentanleistung', 		"profile" => 'PowSolar', 	"pos" => 11),
+        "p_comp" 	=> 	array("ident" => 'p_comp', 		"type" => self::VT_Integer, "name" => 'Gesamtwärmemenge', 		"profile" => 'SolarWM', 	"pos" => 12),
+        "radiation" => 	array("ident" => 'radiation', 	"type" => self::VT_Integer, "name" => 'Einstrahlung', 			"profile" => '', 			"pos" => 13),
+        "Country" 	=> 	array("ident" => 'Country', 	"type" => self::VT_String, 	"name" => 'Ländercode', 			"profile" => '~String', 	"pos" => 14),
+        "Model" 	=> 	array("ident" => 'Model', 		"type" => self::VT_String, 	"name" => 'Modellvariante', 		"profile" => '~String', 	"pos" => 15),
+        "Tds"		=> 	array("ident" => "Tds", 		"type" => self::VT_Integer, "name" => 'temperatur Direktsensor',"profile" => 'TempSolar', 	"pos" => 16), 
+        "v_flow" 	=> 	array("ident" => "v_flow", 		"type" => self::VT_Integer, "name" => 'Volumenstrom', 			"profile" => 'FlowSolar', 	"pos" => 17),
+        "Alarm" 	=> 	array("ident" => "alarm", 		"type" => self::VT_Boolean, "name" => 'Alarm', 					"profile" => 'AlarmSolar', 	"pos" => 18)
     );
     ///[capvars]
 
@@ -60,7 +59,7 @@ class STECA extends T2DModule
         // Diese Zeile nicht löschen
         $json=__DIR__."/module.json";
         parent::__construct($InstanceID,$json);
-        $data = @json_decode($json, true);
+     /*   $data = @json_decode($json, true);
         $this->module_data = $data;
         $this->name = $data["name"];
         if (!isset($this->name)) {
@@ -69,7 +68,7 @@ class STECA extends T2DModule
         }
         $this->useBufferVar=! (method_exists($this,'GetBuffer'));
         $this->DEBUGLOG = IPS_GetLogDir() . "/" . $data["name"] . "debug.log";
-        return true;
+        return true;*/
     }
 
 	
@@ -85,7 +84,8 @@ class STECA extends T2DModule
         $this->RegisterPropertyString('Class', '');
         $this->RegisterPropertyString('CapList', '');
         $this->RegisterPropertyBoolean('Debug', false);
-        //Properties
+       
+	   //Properties
 		//muss nochmal aufgeräumt werden
  		$this->RegisterPropertyString('Category', 'STECA Devices');
         $this->RegisterPropertyInteger('ParentCategory', 0); //parent cat is root
@@ -96,10 +96,10 @@ class STECA extends T2DModule
         $this->RegisterPropertyBoolean('Active', false);
 
 		//VariablenProfile
-        $this->check_profile('TempSolar', 1, "", " °C", "Temperature", -200, +500, 1, 0, false);
-        $this->check_profile('PowSolar', 2, "", " kW", "", 0, +1000, 0.1, 0, false);
-        $this->check_profile('FlowSolar', 1, "", " l/min", "", 0, +50, 1, 0, false);
-        $this->check_profile('SolarWM', 1, "", " kWh", "", 0, 0, 1, 0, false);
+        $this->check_profile('TempSolar', self::VT_Integer, "", " °C", "Temperature", -10, +500, 1, 0, false);
+        $this->check_profile('PowSolar', self::VT_Float, "", " kW", "", 0, +1000, 0.1, 0, false);
+        $this->check_profile('FlowSolar', self::VT_Integer, "", " l/min", "", 0, +50, 1, 0, false);
+        $this->check_profile('SolarWM', self::VT_Integer, "", " kWh", "", 0, 0, 1, 0, false);
 
 		$this->CreateVarProfileAlarmSolar();
 		$this->CreateVarProfileIntensity();
@@ -111,7 +111,7 @@ class STECA extends T2DModule
         IPS_SetHidden($this->GetIDForIdent('LastUpdate'), true);
 
         //Timers
-        $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
+      //  $this->RegisterTimer('ReInit', 60000, $this->module_data['prefix'] . '_ReInitEvent($_IPS[\'TARGET\']);');
 
         //Connect Parent
         $this->RequireParent($this->module_interfaces['Cutter']);
@@ -136,7 +136,8 @@ class STECA extends T2DModule
 		
 	}
 
-		// Variablenprofile erstellen
+	//Hier ein paar Hilfsfunktionen
+	// Variablenprofile erstellen
 	private function CreateVarProfile($name, $ProfileType, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Icon) {
 		if (!IPS_VariableProfileExists($name)) {
 			IPS_CreateVariableProfile($name, $ProfileType);
@@ -146,7 +147,7 @@ class STECA extends T2DModule
 			IPS_SetVariableProfileIcon($name, $Icon);
         }
     }		
-	//Variablenprofil für die Windgeschwindigkeit erstellen
+	//Variablenprofil für den Alarm (Stagnationswarnung) erzeugen
 	private function CreateVarProfileAlarmSolar() {
 		if (!IPS_VariableProfileExists("AlarmSolar")) {
 			IPS_CreateVariableProfile("AlarmSolar", 0);
@@ -166,38 +167,35 @@ class STECA extends T2DModule
 
 
 		
-    //--------------------------------------------------------
+    //------------------------------------------------------------------------------
     /**
      * Destructor
      */
     public function Destroy()
     {
+
         parent::Destroy();
     }
 
     //------------------------------------------------------------------------------
-	// Überschreibt die intere IPS_ApplyChanges($id) Funktion
-     public function ApplyChanges()
+    /**
+     * overload internal IPS_ApplyChanges($id) function
+     */
+    public function ApplyChanges()
     {
         // Diese Zeile nicht loeschen
         parent::ApplyChanges();
-
-        $this->debug(__FUNCTION__, "ApplyChanges");
-		
         if (IPS_GetKernelRunlevel() == self::KR_READY) {
             if ($this->HasActiveParent()) {
                 $this->SetStatus(self::ST_AKTIV);
-            }else{
+            } else {
                 $this->SetStatus(self::ST_NOPARENT);
-				$this->debug(__FUNCTION__, "NoParent");
-
             } //check status
         }
         //must be here!!
         $this->SetStatusVariables(); //Update Variables
-       // $this->SetReceiveDataFilter(".*TR0603.*");
     }
-	
+
 
     //------------------------------------------------------------------------------
     //---Events
@@ -206,7 +204,7 @@ class STECA extends T2DModule
      * Timer Event to reinitialize system
      * Executed if there are no valid data within Timer as indicated by LastUpdate
      */
-    public function ReInitEvent()
+    public function ReInitEvent() //Aktuell nicht gebraucht
     {
         $id = @$this->GetIDForIdent('LastUpdate');
         if (!$id) return;
@@ -222,7 +220,39 @@ class STECA extends T2DModule
         }
     }
 
-	
+//------------------------------------------------------------------------------
+    //Get/Set
+    //------------------------------------------------------------------------------
+    /**
+     * Get Property DeviceID
+     * @return string
+     */
+    private function GetDeviceID()
+    {
+        return (String)IPS_GetProperty($this->InstanceID, 'DeviceID');
+    }
+
+    //------------------------------------------------------------------------------
+    /**
+     * Get Property Type
+     * @return string
+     */
+    private function GetType()
+    {
+        return (String)IPS_GetProperty($this->InstanceID, 'Typ');
+    }
+
+
+    //------------------------------------------------------------------------------
+    /**
+     * GetProperty Modul class of creator
+     * @return string
+     */
+    private function GetClass()
+    {
+        return (String)IPS_GetProperty($this->InstanceID, 'Class');
+    }
+
     //------------------------------------------------------------------------------
     /**
      * Initialization sequence
@@ -231,7 +261,7 @@ class STECA extends T2DModule
     {
         $this->debug(__FUNCTION__, 'Init entered');
        // $this->SetLocalBuffer('');
-        $this->SetTimerInterval('ReInit', 60000);
+       // $this->SetTimerInterval('ReInit', 60000);
 		$pid = $this->GetParent();
         $this->debug(__FUNCTION__, "ParentID ist $pid");
     }
@@ -349,27 +379,26 @@ class STECA extends T2DModule
         
 
         //Felddefinitionen
-        $steca_data['Time'] = '';  
-        $steca_data['T1'] = '';
-        $steca_data['T2'] = '';
-	    $steca_data['T3'] = '';
-	    $steca_data['T4'] = '';
-	    $steca_data['T5'] = '';
-	    $steca_data['T6'] = '';
-	    $steca_data['R1'] = '';
-	    $steca_data['R2'] = '';
-	    $steca_data['R3'] = '';
-        $steca_data['System'] = '';
-	    $steca_data['WMZ'] = '';
-	    $steca_data['p_curr'] = '';
-	    $steca_data['p_comp'] = '';
-	    $steca_data['radiation'] = '';
-	    $steca_data['Country'] = '';
-	    $steca_data['Model'] = '';
-	
-	    $steca_data['TDS'] = '';
-	    $steca_data['v_flow'] = '';
-	    $steca_data['Alarm'] = '';
+        $steca_data['Time'] 	= '';  
+        $steca_data['T1'] 		= '';
+        $steca_data['T2'] 		= '';
+	    $steca_data['T3'] 		= '';
+	    $steca_data['T4'] 		= '';
+	    $steca_data['T5'] 		= '';
+	    $steca_data['T6'] 		= '';
+	    $steca_data['R1'] 		= '';
+	    $steca_data['R2'] 		= '';
+	    $steca_data['R3'] 		= '';
+        $steca_data['System'] 	= '';
+	    $steca_data['WMZ'] 		= '';
+	    $steca_data['p_curr'] 	= '';
+	    $steca_data['p_comp'] 	= '';
+	    $steca_data['radiation']= '';
+	    $steca_data['Country'] 	= '';
+	    $steca_data['Model'] 	= '';
+	    $steca_data['TDS'] 		= '';
+	    $steca_data['v_flow'] 	= '';
+	    $steca_data['Alarm'] 	= '';
 		
 		
         $fields = explode(';', $data);
