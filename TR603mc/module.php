@@ -274,7 +274,7 @@ class STECA extends T2DModule
      * @param string $JSONString
      *Daten aus dem Cutter lesen
 	 */
-    public function ReceiveData($JSONString)
+    /*public function ReceiveData($JSONString)
     {
         $this->debug(__FUNCTION__, 'Receivedata entered');
        //trigger status check
@@ -328,8 +328,48 @@ class STECA extends T2DModule
         } else {
             $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
         }
-    }
+    }*/
 	
+    public function ReceiveData($JSONString)
+    {
+        //status check triggered by data
+        if ($this->isActive() && $this->HasActiveParent()) {
+            $this->SetStatus(self::ST_AKTIV);
+        } else {
+            $this->SetStatus(self::ST_INACTIV);
+            $this->debug(__FUNCTION__, 'Data arrived, but dropped because inactiv:' . $JSONString);
+            return;
+        }
+        // decode Data from Device Instanz
+        if (strlen($JSONString) > 0) {
+            $this->debug(__FUNCTION__, 'Data arrived:' . $JSONString);
+            //$this->mh->debuglog($JSONString);
+            // decode Data from IO Instanz
+            $data = json_decode($JSONString);
+            //entry for data from parent
+
+            $buffer = $this->GetLocalBuffer();
+            if (is_object($data)) $data = get_object_vars($data);
+            if (isset($data['DataID'])) {
+                $target = $data['DataID'];
+                if ($target == $this->module_interfaces['IO-RX']) {
+                    $buffer .= utf8_decode($data['Buffer']);
+                    $this->debug(__FUNCTION__, strToHex($buffer));
+                    $bl = strlen($buffer);
+                    if ($bl > 500) {
+                        $buffer = substr($buffer, 500);
+                        IPS_LogMessage(__CLASS__, "Buffer length exceeded, dropping...");
+                    }
+                    $this->SetLocalBuffer($buffer);
+                }//target
+            }//dataid
+            else {
+                $this->debug(__FUNCTION__, 'No DataID supplied');
+            }//dataid
+        } else {
+            $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
+        }//else len json
+    }//func
 	
 	
 	
