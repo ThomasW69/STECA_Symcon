@@ -1,12 +1,12 @@
 {  
-"id": "{690AD0DC-FE3B-4F37-9AC2-E068DE369D22}",
-"author": "Thomas Westerhoff",
-"name": "STECA Solarregler",
-"url": "",
-"compatibility": {
-        "version": "5.0",
+    "id": "{690AD0DC-FE3B-4F37-9AC2-E068DE369D22}",
+    "name": "STECA Solarregler",
+    "author": "Thomas Westerhoff",
+    "url": "",
+    "compatibility": {
+        "version": "6.0"
     },
-"version": "5.5",  
-"build": 0,
-"date": 0
+    "version": "1.5",
+    "build": 0,
+    "date": 0
 }
