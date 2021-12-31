@@ -274,7 +274,7 @@ class STECA extends T2DModule
      * @param string $JSONString
      *Daten aus dem Cutter lesen
 	 */
-    /*public function ReceiveData($JSONString)
+    public function ReceiveData($JSONString)
     {
         $this->debug(__FUNCTION__, 'Receivedata entered');
        //trigger status check
@@ -328,9 +328,9 @@ class STECA extends T2DModule
         } else {
             $this->debug(__FUNCTION__, 'strlen(JSONString) == 0');
         }
-    }*/
+    }
 	
-    public function ReceiveData($JSONString)
+    /*public function ReceiveData($JSONString)
     {
         //status check triggered by data
         if ($this->isActive() && $this->HasActiveParent()) {
@@ -371,7 +371,7 @@ class STECA extends T2DModule
         }//else len json
     }//func
 	
-	
+	*/
 	
 	    //------------------------------------------------------------------------------
     /**
