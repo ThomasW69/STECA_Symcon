@@ -1,10 +1,6 @@
 {
 	"elements":
 	[
-    	{ "name": "DeviceID", "type": "ValidationTextBox", "caption": "DeviceID" },
-		{ "name": "Typ", "type": "ValidationTextBox", "caption": "Typ" },
-        { "name": "Class", "type": "ValidationTextBox", "caption": "Creator" },
-		{ "name": "CounterFactor", "type": "NumberSpinner", "caption": "Correction Factor", "digits": 3}
-
+    	{ "name": "Active", "type": "CheckBox", "caption": "Activate Instance" }
 	]
 }
